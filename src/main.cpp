@@ -186,12 +186,12 @@ struct MoonProgram {
 std::vector<GLuint> createTextureObjects(glimac::FilePath binPath) {
     std::vector<GLuint> textureObjects;
     std::vector<std::unique_ptr<glimac::Image>> textureImages;
-    textureImages.push_back(glimac::loadImage(binPath + "assets/textures/EarthMap.jpg"));
-    if(textureImages[0] == NULL) printf("Texture loading 'EarthMap.jpg' fail !");
-    textureImages.push_back(glimac::loadImage(binPath + "assets/textures/MoonMap.jpg"));
-    if(textureImages[1] == NULL) printf("Texture loading 'MoonMap.jpg' fail !");
-    textureImages.push_back(glimac::loadImage(binPath + "assets/textures/CloudMap.jpg"));
-    if(textureImages[2] == NULL) printf("Texture loading 'CloudMap.jpg' fail !");
+    textureImages.push_back(glimac::loadImage(binPath + "assets/textures/earth.jpg"));
+    if(textureImages[0] == NULL) printf("Texture loading 'earth.jpg' fail !");
+    textureImages.push_back(glimac::loadImage(binPath + "assets/textures/moon.jpg"));
+    if(textureImages[1] == NULL) printf("Texture loading 'moon.jpg' fail !");
+    textureImages.push_back(glimac::loadImage(binPath + "assets/textures/earthcloud.jpg"));
+    if(textureImages[2] == NULL) printf("Texture loading 'earthcloud.jpg' fail !");
     for(size_t i=0; i<textureImages.size(); i++) {
         GLuint texo;
         glGenTextures(1, &texo);
