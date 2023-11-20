@@ -8,9 +8,13 @@ int CAMERA_TYPE = 0; // 0=trackball, 1=freefly
 glimac::TrackballCamera trackballCamera;
 glimac::FreeflyCamera freeflyCamera;
 
-
+/* Main fonction of the engine */
 void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath);
 
+
+// ============================================================
+// CALLBACKS (user inputs)
+// ============================================================
 
 static void key_callback(GLFWwindow* window, int key, int /*scancode*/, int action, int /*mods*/) {
     if(action == GLFW_PRESS) {
@@ -76,7 +80,7 @@ int main(int argc, char** argv) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #endif
 
-    GLFWwindow* window = glfwCreateWindow(window_width, window_height, "Computer Graphics", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(window_width, window_height, "VisuSysSol", nullptr, nullptr);
     if (!window) {
         glfwTerminate();
         return -1;
@@ -101,8 +105,8 @@ int main(int argc, char** argv) {
     std::cout << "Launching... " << argc << " " << argv << std::endl;
     std::cout << "OpenGL Version : " << glGetString(GL_VERSION) << std::endl;
 
+    /* Launch engine */
     glimac::FilePath applicationPath(argv[0]);
-
     visusyssol(window, applicationPath);
     
     glfwTerminate();
@@ -114,7 +118,7 @@ void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
     // EarthProgram earth(applicationPath);
     MoonProgram moon(applicationPath);
     auto textureObjects = createTextureObjects(applicationPath.dirPath());
-    GLuint texoEarth = textureObjects[0], texoMoon = textureObjects[1], texoCloud = textureObjects[2];
+    GLuint texoEarth = textureObjects[3], texoMoon = textureObjects[11], texoCloud = textureObjects[10];
     const GLuint VERTEX_ATTR_POSITION = 0;
     const GLuint VERTEX_ATTR_NORMAL = 1;
     const GLuint VERTEX_ATTR_TEXTURE = 2;

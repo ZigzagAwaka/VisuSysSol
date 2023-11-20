@@ -1,22 +1,45 @@
 #include "engine.hpp"
 
 
+/**
+ * Load every textures. The returned vector contains all textures is this order:
+ * "sun.jpg", "mercury.jpg", "venus.jpg", "earth.jpg", "mars.jpg", "jupiter.jpg",
+ * "saturn.jpg", "uranus.jpg", "neptune.jpg", "pluto.jpg", "earthcloud.jpg", "moon.jpg",
+ * "phobos.jpg", "deimos.jpg", "calisto.jpg", "ganymede.jpg", "europa.jpg", "io.jpg",
+ * "mimas.jpg", "enceladus.jpg", "tethys.jpg", "dione.jpg", "rhea.jpg", "titan.jpg",
+ * "hyperion.jpg", "iapetus.jpg", "saturnring.jpg", "ariel.jpg", "umbriel.jpg",
+ * "titania.jpg", "oberon.jpg", "miranda.jpg", "uranusring.jpg", "triton.jpg",
+ * "nereid.jpg", "charon.jpg"
+*/
 std::vector<GLuint> createTextureObjects(glimac::FilePath binPath) {
     std::vector<GLuint> textureObjects;
-    std::vector<std::unique_ptr<glimac::Image>> textureImages;
-    textureImages.push_back(glimac::loadImage(binPath + "assets/textures/earth.jpg"));
-    if(textureImages[0] == NULL) printf("Texture loading 'earth.jpg' fail !");
-    textureImages.push_back(glimac::loadImage(binPath + "assets/textures/moon.jpg"));
-    if(textureImages[1] == NULL) printf("Texture loading 'moon.jpg' fail !");
-    textureImages.push_back(glimac::loadImage(binPath + "assets/textures/earthcloud.jpg"));
-    if(textureImages[2] == NULL) printf("Texture loading 'earthcloud.jpg' fail !");
+    //std::vector<std::unique_ptr<glimac::Image>> textureImages;
+    std::string dir = "assets/textures/";
+    std::vector<std::string> textureImages = {
+        "sun.jpg", "mercury.jpg", "venus.jpg", "earth.jpg", "mars.jpg", "jupiter.jpg",
+        "saturn.jpg", "uranus.jpg", "neptune.jpg", "pluto.jpg", "earthcloud.jpg", "moon.jpg",
+        "phobos.jpg", "deimos.jpg", "calisto.jpg", "ganymede.jpg", "europa.jpg", "io.jpg",
+        "mimas.jpg", "enceladus.jpg", "tethys.jpg", "dione.jpg", "rhea.jpg", "titan.jpg",
+        "hyperion.jpg", "iapetus.jpg", "saturnring.jpg", "ariel.jpg", "umbriel.jpg",
+        "titania.jpg", "oberon.jpg", "miranda.jpg", "uranusring.jpg", "triton.jpg",
+        "nereid.jpg", "charon.jpg"};
+    // textureImages.push_back(glimac::loadImage(binPath + "assets/textures/earth.jpg"));
+    // if(textureImages[0] == NULL) printf("Texture loading 'earth.jpg' fail !");
+    // textureImages.push_back(glimac::loadImage(binPath + "assets/textures/moon.jpg"));
+    // if(textureImages[1] == NULL) printf("Texture loading 'moon.jpg' fail !");
+    // textureImages.push_back(glimac::loadImage(binPath + "assets/textures/earthcloud.jpg"));
+    // if(textureImages[2] == NULL) printf("Texture loading 'earthcloud.jpg' fail !");
     for(size_t i=0; i<textureImages.size(); i++) {
+        auto image = glimac::loadImage(binPath + dir + textureImages[i]);
+        if(image == NULL) {
+            std::cerr << "Texture loading " << textureImages[i] << " fail !" << std::endl;
+            continue; }
         GLuint texo;
         glGenTextures(1, &texo);
         glBindTexture(GL_TEXTURE_2D, texo);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureImages[i].get()->getWidth(), textureImages[i].get()->getHeight(), 0, GL_RGBA, GL_FLOAT, textureImages[i].get()->getPixels());
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.get()->getWidth(), image.get()->getHeight(), 0, GL_RGBA, GL_FLOAT, image.get()->getPixels());
         glBindTexture(GL_TEXTURE_2D, 0);
         textureObjects.push_back(texo);
     }
