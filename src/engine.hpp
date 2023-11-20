@@ -21,5 +21,7 @@
 
 
 std::vector<GLuint> createTextureObjects(glimac::FilePath binPath);
+glimac::Sphere createSphere(GLuint* vbo, GLuint* vao, int radius, int discLat, int discLong);
+
 void drawObjects(glimac::FilePath applicationPath, GLuint texoEarth, GLuint texoCloud, float r, glm::mat4 globalMVMatrix, glm::mat4 viewMatrix, glm::mat4 ProjMatrix, glimac::Sphere ss);
 

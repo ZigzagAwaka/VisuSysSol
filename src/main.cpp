@@ -118,30 +118,33 @@ void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
     // EarthProgram earth(applicationPath);
     MoonProgram moon(applicationPath);
     auto textureObjects = createTextureObjects(applicationPath.dirPath());
-    GLuint texoEarth = textureObjects[3], texoMoon = textureObjects[11], texoCloud = textureObjects[10];
-    const GLuint VERTEX_ATTR_POSITION = 0;
-    const GLuint VERTEX_ATTR_NORMAL = 1;
-    const GLuint VERTEX_ATTR_TEXTURE = 2;
+    GLuint texoEarth = textureObjects[3], texoMoon = textureObjects[10], texoCloud = textureObjects[33];
+    // const GLuint VERTEX_ATTR_POSITION = 0;
+    // const GLuint VERTEX_ATTR_NORMAL = 1;
+    // const GLuint VERTEX_ATTR_TEXTURE = 2;
 
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glimac::Sphere sphere(1, 64, 64);
-    glBufferData(GL_ARRAY_BUFFER, sphere.getVertexCount()*sizeof(glimac::ShapeVertex), sphere.getDataPointer(), GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // GLuint vbo;
+    // glGenBuffers(1, &vbo);
+    // glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    // glimac::Sphere sphere(1, 64, 64);
+    // glBufferData(GL_ARRAY_BUFFER, sphere.getVertexCount()*sizeof(glimac::ShapeVertex), sphere.getDataPointer(), GL_STATIC_DRAW);
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-    glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
-    glEnableVertexAttribArray(VERTEX_ATTR_NORMAL);
-    glEnableVertexAttribArray(VERTEX_ATTR_TEXTURE);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glVertexAttribPointer(VERTEX_ATTR_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, position));
-    glVertexAttribPointer(VERTEX_ATTR_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, normal));
-    glVertexAttribPointer(VERTEX_ATTR_TEXTURE, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, texCoords));
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    // GLuint vao;
+    // glGenVertexArrays(1, &vao);
+    // glBindVertexArray(vao);
+    // glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
+    // glEnableVertexAttribArray(VERTEX_ATTR_NORMAL);
+    // glEnableVertexAttribArray(VERTEX_ATTR_TEXTURE);
+    // glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    // glVertexAttribPointer(VERTEX_ATTR_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, position));
+    // glVertexAttribPointer(VERTEX_ATTR_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, normal));
+    // glVertexAttribPointer(VERTEX_ATTR_TEXTURE, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, texCoords));
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glBindVertexArray(0);
+
+    GLuint vbo; GLuint vao;
+    glimac::Sphere sphere = createSphere(&vbo, &vao, 1, 64, 64);
 
     int NB_MOONS = 30;
     float MOON_DISTANCE = 5.0;
