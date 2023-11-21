@@ -113,6 +113,16 @@ struct PlanetInfo {
     float orbital_inclination(int i) {
         return p[i].orbital_inclination;
     }
+
+    /*number of planets, or celestial body, in this structure*/
+    int nbOfPlanets() {
+        return p.size();
+    }
+
+    /*return true if the asked planet has multiple texture layers*/
+    bool hasMultipleTex(int i) {
+        return i == 3; // only the Earth, for now
+    }
 };
 
 
@@ -122,8 +132,8 @@ struct UniformVariables {
     GLint uMVPMatrix; // model view proj
     GLint uMVMatrix; // model view
     GLint uNormalMatrix; // norm
-    GLint uTexture;
-    GLint uTexture2;
+    GLint uTexture0;
+    GLint uTexture1;
     GLint uKd; // material diffuse reflection
     GLint uKs; // material glossy reflection
     GLint uShininess; // material shine factor
@@ -138,17 +148,38 @@ struct PlanetProgram {
 
     PlanetProgram(const glimac::FilePath& applicationPath):
         m_Program {loadProgram(applicationPath.dirPath() + "src/shaders/position3D.vs.glsl",
-                                applicationPath.dirPath() + "src/shaders/directionallight_multiTex3D.fs.glsl")} {
+                                applicationPath.dirPath() + "src/shaders/multiTex3D_light.fs.glsl")} {
         u.uMVPMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVPMatrix");
         u.uMVMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVMatrix");
         u.uNormalMatrix = glGetUniformLocation(m_Program.getGLId(), "uNormalMatrix");
-        u.uTexture = glGetUniformLocation(m_Program.getGLId(), "uTexture");
-        u.uTexture2 = glGetUniformLocation(m_Program.getGLId(), "uTexture2");
+        u.uTexture0 = glGetUniformLocation(m_Program.getGLId(), "uTexture0");
+        u.uTexture1 = glGetUniformLocation(m_Program.getGLId(), "uTexture1");
         u.uKd = glGetUniformLocation(m_Program.getGLId(), "uKd");
         u.uKs = glGetUniformLocation(m_Program.getGLId(), "uKs");
         u.uShininess = glGetUniformLocation(m_Program.getGLId(), "uShininess");
         u.uLightDir_vs = glGetUniformLocation(m_Program.getGLId(), "uLightDir_vs");
         u.uLightIntensity = glGetUniformLocation(m_Program.getGLId(), "uLightIntensity");
+    };
+};
+
+/* Program of the sun */
+struct StarProgram {
+    glimac::Program m_Program;
+    UniformVariables u;
+
+    StarProgram(const glimac::FilePath& applicationPath):
+        m_Program {loadProgram(applicationPath.dirPath() + "src/shaders/position3D.vs.glsl",
+                                applicationPath.dirPath() + "src/shaders/tex3D.fs.glsl")} {
+        u.uMVPMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVPMatrix");
+        u.uMVMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVMatrix");
+        u.uNormalMatrix = glGetUniformLocation(m_Program.getGLId(), "uNormalMatrix");
+        u.uTexture0 = glGetUniformLocation(m_Program.getGLId(), "uTexture0");
+        // u.uTexture1 = glGetUniformLocation(m_Program.getGLId(), "uTexture1");
+        // u.uKd = glGetUniformLocation(m_Program.getGLId(), "uKd");
+        // u.uKs = glGetUniformLocation(m_Program.getGLId(), "uKs");
+        // u.uShininess = glGetUniformLocation(m_Program.getGLId(), "uShininess");
+        // u.uLightDir_vs = glGetUniformLocation(m_Program.getGLId(), "uLightDir_vs");
+        // u.uLightIntensity = glGetUniformLocation(m_Program.getGLId(), "uLightIntensity");
     };
 };
 
@@ -160,7 +191,7 @@ struct MoonProgram {
     GLint uMVPMatrix;
     GLint uMVMatrix;
     GLint uNormalMatrix;
-    GLint uTexture;
+    GLint uTexture0;
     GLint uKd;
     GLint uKs;
     GLint uShininess;
@@ -169,11 +200,11 @@ struct MoonProgram {
 
     MoonProgram(const glimac::FilePath& applicationPath):
         m_Program {loadProgram(applicationPath.dirPath() + "src/shaders/position3D.vs.glsl",
-                                applicationPath.dirPath() + "src/shaders/directionallight.fs.glsl")} {
+                                applicationPath.dirPath() + "src/shaders/tex3D_light.fs.glsl")} {
         uMVPMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVPMatrix");
         uMVMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVMatrix");
         uNormalMatrix = glGetUniformLocation(m_Program.getGLId(), "uNormalMatrix");
-        uTexture = glGetUniformLocation(m_Program.getGLId(), "uTexture");
+        uTexture0 = glGetUniformLocation(m_Program.getGLId(), "uTexture0");
         uKd = glGetUniformLocation(m_Program.getGLId(), "uKd");
         uKs = glGetUniformLocation(m_Program.getGLId(), "uKs");
         uShininess = glGetUniformLocation(m_Program.getGLId(), "uShininess");

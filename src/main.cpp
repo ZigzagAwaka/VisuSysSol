@@ -115,10 +115,12 @@ int main(int argc, char** argv) {
 
 
 void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
-    // EarthProgram earth(applicationPath);
+    PlanetInfo planetInfo;
+    StarProgram star(applicationPath);
+    PlanetProgram planet(applicationPath);
     MoonProgram moon(applicationPath);
-    auto textureObjects = createTextureObjects(applicationPath.dirPath());
-    GLuint texoEarth = textureObjects[3], texoMoon = textureObjects[10], texoCloud = textureObjects[33];
+    std::vector<GLuint> textureObjects = createTextureObjects(applicationPath.dirPath());
+    // GLuint texoEarth = textureObjects[3], texoMoon = textureObjects[10], texoCloud = textureObjects[33];
     // const GLuint VERTEX_ATTR_POSITION = 0;
     // const GLuint VERTEX_ATTR_NORMAL = 1;
     // const GLuint VERTEX_ATTR_TEXTURE = 2;
@@ -146,36 +148,38 @@ void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
     GLuint vbo; GLuint vao;
     glimac::Sphere sphere = createSphere(&vbo, &vao, 1, 64, 64);
 
-    int NB_MOONS = 30;
-    float MOON_DISTANCE = 5.0;
-    float ROTATION_SPEED = 0.8;
-    std::vector<glm::vec3> moonTranslation; // original position of the moon compared to the planet
-    std::vector<glm::vec3> rotationAxis; // rotation axis of the moon around the planet
-    for(int i=0; i<NB_MOONS; i++) {
-        moonTranslation.push_back(glm::sphericalRand(MOON_DISTANCE));
-        float x = 1.0, z = 1.0, y = ((moonTranslation[i].x * x) + (moonTranslation[i].z * z)) / (-1.0*moonTranslation[i].y);
-        rotationAxis.push_back(glm::vec3(x,y,z));
-    }
+    // int NB_MOONS = 30;
+    // float MOON_DISTANCE = 5.0;
+    // float ROTATION_SPEED = 0.8;
+    // std::vector<glm::vec3> moonTranslation; // original position of the moon compared to the planet
+    // std::vector<glm::vec3> rotationAxis; // rotation axis of the moon around the planet
+    // for(int i=0; i<NB_MOONS; i++) {
+    //     moonTranslation.push_back(glm::sphericalRand(MOON_DISTANCE));
+    //     float x = 1.0, z = 1.0, y = ((moonTranslation[i].x * x) + (moonTranslation[i].z * z)) / (-1.0*moonTranslation[i].y);
+    //     rotationAxis.push_back(glm::vec3(x,y,z));
+    // }
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
 
-        glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.0f), float(window_width/window_height), 0.1f, 100.0f);
+        std::vector<glm::mat4> matrix(3); // ProjMatrix, globalMVMatrix, viewMatrix
+        matrix[0] = glm::perspective(glm::radians(70.0f), float(window_width/window_height), 0.1f, 100.0f);
         glm::mat4 modelMatrix = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
-        glm::mat4 globalMVMatrix;
-        glm::mat4 viewMatrix;
+        //glm::mat4 globalMVMatrix; glm::mat4 viewMatrix;
         if(CAMERA_TYPE == 0) {
-            viewMatrix = trackballCamera.getViewMatrix();
-            globalMVMatrix = modelMatrix * viewMatrix;
+            matrix[2] = trackballCamera.getViewMatrix();
+            matrix[1] = modelMatrix * matrix[2];
         }
         else {
-            viewMatrix = freeflyCamera.getViewMatrix();
-            globalMVMatrix = viewMatrix * modelMatrix;
+            matrix[2] = freeflyCamera.getViewMatrix();
+            matrix[1] = matrix[2] * modelMatrix;
         }
 
+        drawEverything(&star, &planet, planetInfo, textureObjects, matrix, sphere);
+
         // EARTH
-        drawObjects(applicationPath, texoEarth, texoCloud, ROTATION_SPEED, globalMVMatrix, viewMatrix, ProjMatrix, sphere);
+        //drawObjects(&planet, texoEarth, texoCloud, ROTATION_SPEED, matrix[1], matrix[2], matrix[0], sphere);
         // earth.m_Program.use();
         // glUniform1i(earth.uTexture, 0);
         // glUniform1i(earth.uTexture2, 1);
@@ -195,25 +199,25 @@ void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
         // glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
 
         // MOONS
-        moon.m_Program.use();
-        glUniform1i(moon.uTexture, 0);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texoMoon);
-        glUniform3fv(moon.uKd, 1, glm::value_ptr(glm::vec3(0.8, 0.7, 0.7)));
-        glUniform3fv(moon.uKs, 1, glm::value_ptr(glm::vec3(0.5, 0.5, 0.4)));
-        glUniform1f(moon.uShininess, 4.0f);
-        glUniform3fv(moon.uLightDir_vs, 1, glm::value_ptr(glm::mat3(glm::rotate(glm::mat4(1.0), float(glfwGetTime() * ROTATION_SPEED * 0.5), glm::vec3(0, 1, 0))) * glm::mat3(viewMatrix)));
-        glUniform3fv(moon.uLightIntensity, 1, glm::value_ptr(glm::vec3(0.9, 0.9, 0.88)));
-        for(int n=0; n<NB_MOONS; n++) {
-            glm::mat4 moonMVMatrix = glm::rotate(globalMVMatrix, float(glfwGetTime() * ROTATION_SPEED), rotationAxis[n]);
-            moonMVMatrix = glm::translate(moonMVMatrix, moonTranslation[n]);
-            moonMVMatrix = glm::rotate(moonMVMatrix, float(glfwGetTime() * ROTATION_SPEED * -1.0), rotationAxis[n]);
-            moonMVMatrix = glm::scale(moonMVMatrix, glm::vec3(0.2, 0.2, 0.2));
-            glUniformMatrix4fv(moon.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * moonMVMatrix));
-            glUniformMatrix4fv(moon.uMVMatrix, 1, GL_FALSE, glm::value_ptr(moonMVMatrix));
-            glUniformMatrix4fv(moon.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(moonMVMatrix))));
-            glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
-        }
+        // moon.m_Program.use();
+        // glUniform1i(moon.uTexture0, 0);
+        // glActiveTexture(GL_TEXTURE0);
+        // glBindTexture(GL_TEXTURE_2D, texoMoon);
+        // glUniform3fv(moon.uKd, 1, glm::value_ptr(glm::vec3(0.8, 0.7, 0.7)));
+        // glUniform3fv(moon.uKs, 1, glm::value_ptr(glm::vec3(0.5, 0.5, 0.4)));
+        // glUniform1f(moon.uShininess, 4.0f);
+        // glUniform3fv(moon.uLightDir_vs, 1, glm::value_ptr(glm::mat3(glm::rotate(glm::mat4(1.0), float(glfwGetTime() * ROTATION_SPEED * 0.5), glm::vec3(0, 1, 0))) * glm::mat3(matrix[2])));
+        // glUniform3fv(moon.uLightIntensity, 1, glm::value_ptr(glm::vec3(0.9, 0.9, 0.88)));
+        // for(int n=0; n<NB_MOONS; n++) {
+        //     glm::mat4 moonMVMatrix = glm::rotate(matrix[1], float(glfwGetTime() * ROTATION_SPEED), rotationAxis[n]);
+        //     moonMVMatrix = glm::translate(moonMVMatrix, moonTranslation[n]);
+        //     moonMVMatrix = glm::rotate(moonMVMatrix, float(glfwGetTime() * ROTATION_SPEED * -1.0), rotationAxis[n]);
+        //     moonMVMatrix = glm::scale(moonMVMatrix, glm::vec3(0.2, 0.2, 0.2));
+        //     glUniformMatrix4fv(moon.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(matrix[0] * moonMVMatrix));
+        //     glUniformMatrix4fv(moon.uMVMatrix, 1, GL_FALSE, glm::value_ptr(moonMVMatrix));
+        //     glUniformMatrix4fv(moon.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(moonMVMatrix))));
+        //     glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
+        // }
         
         glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);

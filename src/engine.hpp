@@ -20,8 +20,24 @@
 #include "planets.hpp"
 
 
+/** Load every textures. The returned vector contains all textures is the global
+ * order (see planets.hpp for the order) */
 std::vector<GLuint> createTextureObjects(glimac::FilePath binPath);
+
+/** Load and return a sphere vertex object
+ * Fill the vbo and vao pointers parameters */
 glimac::Sphere createSphere(GLuint* vbo, GLuint* vao, int radius, int discLat, int discLong);
 
-void drawObjects(glimac::FilePath applicationPath, GLuint texoEarth, GLuint texoCloud, float r, glm::mat4 globalMVMatrix, glm::mat4 viewMatrix, glm::mat4 ProjMatrix, glimac::Sphere ss);
+/** Draw every objects of the solar system (function for the MAIN LOOP)
+ * @param star program structure of the sun
+ * @param planet program structure of planets
+ * @param info PlanetInfo structure containing every planet data
+ * @param textures vector containing every pre-loaded textures
+ * @param matrix vector containing the ProjMatrix, globalMVMatrix and viewMatrix
+ * @param sphere a full constructed glimac::Sphere
+*/
+void drawEverything(StarProgram* star, PlanetProgram* planet, PlanetInfo info, std::vector<GLuint> textures, std::vector<glm::mat4> matrix, glimac::Sphere sphere);
+
+// test
+void drawObjects(PlanetProgram* earth, GLuint texoEarth, GLuint texoCloud, float r, glm::mat4 globalMVMatrix, glm::mat4 viewMatrix, glm::mat4 ProjMatrix, glimac::Sphere ss);
 

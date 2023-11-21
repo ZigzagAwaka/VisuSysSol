@@ -6,7 +6,7 @@ in vec2 vTexCoords; // Coordonnées de texture du sommet
 
 out vec3 fFragColor;
 
-uniform sampler2D uTexture;
+uniform sampler2D uTexture0;
 uniform vec3 uKd;
 uniform vec3 uKs;
 uniform float uShininess;
@@ -25,6 +25,6 @@ vec3 blinnPhong() {
 
 
 void main() {
-    vec4 planetaryTex = texture(uTexture, vTexCoords);
+    vec4 planetaryTex = texture(uTexture0, vTexCoords);
     fFragColor = vec3(planetaryTex.x, planetaryTex.y, planetaryTex.z) * blinnPhong() * 2.0;
 }

@@ -6,13 +6,13 @@ in vec2 vTexCoords; // Coordonnées de texture du sommet
 
 out vec3 fFragColor;
 
-uniform sampler2D uTexture;
-uniform sampler2D uTexture2;
+uniform sampler2D uTexture0;
+uniform sampler2D uTexture1;
 
 
 void main() {
-    vec4 planetaryTex = texture(uTexture, vTexCoords);
-    vec4 cloudTex = texture(uTexture2, vTexCoords);
+    vec4 planetaryTex = texture(uTexture0, vTexCoords);
+    vec4 cloudTex = texture(uTexture1, vTexCoords);
     fFragColor = vec3(planetaryTex.x, planetaryTex.y, planetaryTex.z)
                     + vec3(cloudTex.x, cloudTex.y, cloudTex.z);
 }
