@@ -6,6 +6,8 @@
 #include <glimac/Program.hpp>
 #include <glimac/FilePath.hpp>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/geometric.hpp>
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +18,8 @@
  * sun, mercury, venus, earth, mars, jupiter, saturn, uranus, neptune, pluto,
  * moon, phobos, deimos, calisto, ganymede, europa, io, mimas, enceladus,
  * tethys, dione, rhea, titan, hyperion, iapetus, ariel, umbriel, titania,
- * oberon, miranda, triton, nereid, charon, earthcloud, saturnring, uranusring
+ * oberon, miranda, triton, nereid, charon,
+ * earthcloud, saturnring, uranusring
 */
 
 
@@ -33,7 +36,13 @@ struct PlanetParams {
 /* Global structure to get every parameters of the planets */
 struct PlanetInfo {
     private:
-    std::vector<PlanetParams> p;
+    std::vector<PlanetParams> p; // planets parameters
+    float size_fix = 15.0; // modify size of planets
+    float sun_size_fix = 1.2; // modify size of sun
+    float distance_fix = (sun_size_fix - 1.0) * 1000.0; // correct distance of planets (do not touch)
+    float o_speed = 500.0; // orbit factor speed
+    float r_speed = 20.0; // rotation factor speed
+    glm::vec3 ecliptic = glm::vec3(0, 1, 0); // rotation axis of earth
 
     public:
     PlanetInfo() {
@@ -50,7 +59,7 @@ struct PlanetInfo {
             PlanetParams{4436.8, 7375.9, 2376.0, 90560.0, 153.3, 17.2}, // pluto
             PlanetParams{0.3, 0.3, 3476.2, 27.3, 27.3, 5.1}, // moon
             PlanetParams{0.009, 0.009, 11.0, 0.3, 0.3, 1.0}, // phobos
-            PlanetParams{0.02, 0.023, 6.0, 1.2, 1.2, 1.7}, // deimos
+            PlanetParams{0.02, 0.02, 6.0, 1.2, 1.2, 1.7}, // deimos
             PlanetParams{1.8, 1.8, 4820.6, 16.6, 16.6, 0.1}, // calisto
             PlanetParams{1.0, 1.0, 5262.4, 7.1, 7.1, 0.1}, // ganymede
             PlanetParams{0.6, 0.6, 3121.6, 3.5, 3.5, 0.4}, // europa
@@ -76,12 +85,12 @@ struct PlanetInfo {
 
     /*closest distance to the sun/planet*/
     float perihelion(int i) {
-        return p[i].perihelion;
+        return p[i].perihelion + distance_fix;
     }
 
     /*furthest distance to the sun/planet*/
     float aphelion(int i) {
-        return p[i].aphelion;
+        return p[i].aphelion + distance_fix;
     }
 
     /*average distance to the sun/planet*/
@@ -96,22 +105,42 @@ struct PlanetInfo {
 
     /*ratio size of the planet compared to earth*/
     float size(int i) {
-        return diameter(i) / diameter(3);
+        if(i == 0) return diameter(0) / diameter(3) * sun_size_fix; // sun
+        return diameter(i) / diameter(3) * size_fix; // other planets
     }
     
     /*number of days for an orbit around the sun/planet*/
     float orbital_period(int i) {
         return p[i].orbital_period;
     }
+
+    /*speed for a full orbit around the sun/planet*/
+    float orbital_speed(int i) {
+        return 1.0 / orbital_period(i) * o_speed;
+    }
     
     /*time for the planet to have a proper orbit*/
     float length_of_days(int i) {
         return p[i].length_of_days;
     }
+
+    /*speed for a proper orbit of the planet*/
+    float rotation_speed(int i) {
+        return 1.0 / length_of_days(i) * r_speed;
+    }
     
-    /*inclination of the orbit*/
+    /*inclination of the orbit, in degrees*/
     float orbital_inclination(int i) {
         return p[i].orbital_inclination;
+    }
+
+    /*inclination of the orbit, given by a vec3*/
+    glm::vec3 inclination(int i) {
+        float inc = orbital_inclination(i);
+        if(inc == 0.0) return ecliptic;
+        glm::vec4 res = glm::rotate(glm::mat4(1.0), glm::radians(inc), glm::vec3(1, 0, 0))
+                        * glm::vec4(ecliptic, 0.0);
+        return glm::vec3(glm::normalize(res));
     }
 
     /*number of planets, or celestial body, in this structure*/
@@ -185,30 +214,30 @@ struct StarProgram {
 
 
 
-// will be removed
-struct MoonProgram {
-    glimac::Program m_Program;
-    GLint uMVPMatrix;
-    GLint uMVMatrix;
-    GLint uNormalMatrix;
-    GLint uTexture0;
-    GLint uKd;
-    GLint uKs;
-    GLint uShininess;
-    GLint uLightDir_vs;
-    GLint uLightIntensity;
+// // will be removed
+// struct MoonProgram {
+//     glimac::Program m_Program;
+//     GLint uMVPMatrix;
+//     GLint uMVMatrix;
+//     GLint uNormalMatrix;
+//     GLint uTexture0;
+//     GLint uKd;
+//     GLint uKs;
+//     GLint uShininess;
+//     GLint uLightDir_vs;
+//     GLint uLightIntensity;
 
-    MoonProgram(const glimac::FilePath& applicationPath):
-        m_Program {loadProgram(applicationPath.dirPath() + "src/shaders/position3D.vs.glsl",
-                                applicationPath.dirPath() + "src/shaders/tex3D_light.fs.glsl")} {
-        uMVPMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVPMatrix");
-        uMVMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVMatrix");
-        uNormalMatrix = glGetUniformLocation(m_Program.getGLId(), "uNormalMatrix");
-        uTexture0 = glGetUniformLocation(m_Program.getGLId(), "uTexture0");
-        uKd = glGetUniformLocation(m_Program.getGLId(), "uKd");
-        uKs = glGetUniformLocation(m_Program.getGLId(), "uKs");
-        uShininess = glGetUniformLocation(m_Program.getGLId(), "uShininess");
-        uLightDir_vs = glGetUniformLocation(m_Program.getGLId(), "uLightDir_vs");
-        uLightIntensity = glGetUniformLocation(m_Program.getGLId(), "uLightIntensity");
-    }
-};
+//     MoonProgram(const glimac::FilePath& applicationPath):
+//         m_Program {loadProgram(applicationPath.dirPath() + "src/shaders/position3D.vs.glsl",
+//                                 applicationPath.dirPath() + "src/shaders/tex3D_light.fs.glsl")} {
+//         uMVPMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVPMatrix");
+//         uMVMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVMatrix");
+//         uNormalMatrix = glGetUniformLocation(m_Program.getGLId(), "uNormalMatrix");
+//         uTexture0 = glGetUniformLocation(m_Program.getGLId(), "uTexture0");
+//         uKd = glGetUniformLocation(m_Program.getGLId(), "uKd");
+//         uKs = glGetUniformLocation(m_Program.getGLId(), "uKs");
+//         uShininess = glGetUniformLocation(m_Program.getGLId(), "uShininess");
+//         uLightDir_vs = glGetUniformLocation(m_Program.getGLId(), "uLightDir_vs");
+//         uLightIntensity = glGetUniformLocation(m_Program.getGLId(), "uLightIntensity");
+//     }
+// };

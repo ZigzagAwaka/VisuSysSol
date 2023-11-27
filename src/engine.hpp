@@ -39,5 +39,5 @@ glimac::Sphere createSphere(GLuint* vbo, GLuint* vao, int radius, int discLat, i
 void drawEverything(StarProgram* star, PlanetProgram* planet, PlanetInfo info, std::vector<GLuint> textures, std::vector<glm::mat4> matrix, glimac::Sphere sphere);
 
 // test
-void drawObjects(PlanetProgram* earth, GLuint texoEarth, GLuint texoCloud, float r, glm::mat4 globalMVMatrix, glm::mat4 viewMatrix, glm::mat4 ProjMatrix, glimac::Sphere ss);
+// void drawObjects(PlanetProgram* earth, GLuint texoEarth, GLuint texoCloud, float r, glm::mat4 globalMVMatrix, glm::mat4 viewMatrix, glm::mat4 ProjMatrix, glimac::Sphere ss);
 

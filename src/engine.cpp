@@ -62,42 +62,71 @@ glimac::Sphere createSphere(GLuint* vbo, GLuint* vao, int radius, int discLat, i
 // ============================================================
 
 // Fill the given uniform variables
-void fillUniforms(UniformVariables u, glm::mat4 objectMVMatrix, std::vector<glm::mat4> matrix) {
-    glUniform3fv(u.uKd, 1, glm::value_ptr(glm::vec3(0.8, 0.7, 0.7)));
-    glUniform3fv(u.uKs, 1, glm::value_ptr(glm::vec3(0.5, 0.5, 0.4)));
-    glUniform1f(u.uShininess, 4.0f);
-    glUniform3fv(u.uLightDir_vs, 1, glm::value_ptr(glm::mat3(glm::rotate( glm::mat4(1.0), float(glfwGetTime() * 1.0 * 0.5), glm::vec3(0, 1, 0))) * glm::mat3(matrix[2])));
-    glUniform3fv(u.uLightIntensity, 1, glm::value_ptr(glm::vec3(0.9, 0.9, 0.88)));
+void fillUniforms(UniformVariables u, glm::mat4 objectMVMatrix, std::vector<glm::mat4> matrix, bool light) {
+    if(light) {
+        glUniform3fv(u.uKd, 1, glm::value_ptr(glm::vec3(0.8, 0.7, 0.7)));
+        glUniform3fv(u.uKs, 1, glm::value_ptr(glm::vec3(0.5, 0.5, 0.4)));
+        glUniform1f(u.uShininess, 4.0f);
+        glUniform3fv(u.uLightDir_vs, 1, glm::value_ptr(glm::mat3(glm::rotate( glm::mat4(1.0), float(glfwGetTime() * 1.0 * 0.5), glm::vec3(0, 1, 0))) * glm::mat3(matrix[2])));
+        glUniform3fv(u.uLightIntensity, 1, glm::value_ptr(glm::vec3(0.9, 0.9, 0.88)));
+    }
     glUniformMatrix4fv(u.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(matrix[0] * objectMVMatrix));
     glUniformMatrix4fv(u.uMVMatrix, 1, GL_FALSE, glm::value_ptr(objectMVMatrix));
     glUniformMatrix4fv(u.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(objectMVMatrix))));
 }
 
+// Activate and bind asked textures (one, or many)
+void prepareTextures(int i, UniformVariables u, std::vector<GLuint> textures, bool multiple) {
+    glUniform1i(u.uTexture0, 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textures[i]);
+    if(multiple) {
+        glUniform1i(u.uTexture1, 1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, textures[33]);
+    }
+}
+
+// Deactivate and debind multiple layers asked textures
+void cleanMultTextures(bool multiple) {
+    if(multiple) {
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+}
+
 
 void drawSun(StarProgram* star, PlanetInfo info, std::vector<GLuint> textures, std::vector<glm::mat4> matrix, glimac::Sphere sphere) {
-    glUniform1i(star->u.uTexture0, 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textures[0]);
-    glm::mat4 sunMVMatrix = glm::rotate(matrix[1], float(glfwGetTime() * 1.0), glm::vec3(0, 1, 0));
-    sunMVMatrix = glm::scale(sunMVMatrix, glm::vec3(10, 10, 10));
-    glUniformMatrix4fv(star->u.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(matrix[0] * sunMVMatrix));
-    glUniformMatrix4fv(star->u.uMVMatrix, 1, GL_FALSE, glm::value_ptr(sunMVMatrix));
-    glUniformMatrix4fv(star->u.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(sunMVMatrix))));
+    // GET DATA
+    float s = info.size(0);
+    float rot_speed = info.rotation_speed(0);
+    // APPLY DATA
+    glm::mat4 sunMVMatrix = glm::rotate(matrix[1], float(glfwGetTime() * rot_speed), glm::vec3(0, 1, 0));
+    sunMVMatrix = glm::scale(sunMVMatrix, glm::vec3(s, s, s));
+    prepareTextures(0, star->u, textures, false);
+    fillUniforms(star->u, sunMVMatrix, matrix, false);
     glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
 }
 
 
 void drawPlanets(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLuint> textures, std::vector<glm::mat4> matrix, glimac::Sphere sphere) {
-    glUniform1i(planet->u.uTexture0, 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textures[i]);
-    glUniform1i(planet->u.uTexture1, 1);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, textures[33]);
-    glm::mat4 planetMVMatrix = glm::rotate(matrix[1], float(glfwGetTime() * 1.0), glm::vec3(0, 1, 0));
-    planetMVMatrix = glm::translate(planetMVMatrix, glm::vec3(15.0, 0, 0));
-    fillUniforms(planet->u, planetMVMatrix, matrix);
+    // GET DATA
+    float d = info.distance(i);
+    float s = info.size(i);
+    float orb_speed = info.orbital_speed(i);
+    float rot_speed = info.rotation_speed(i);
+    glm::vec3 axis = info.inclination(i);
+    bool mult = info.hasMultipleTex(i);
+    // APPLY DATA
+    glm::mat4 planetMVMatrix = glm::rotate(matrix[1], float(glfwGetTime() * orb_speed), axis);
+    planetMVMatrix = glm::translate(planetMVMatrix, glm::vec3(d, 0, 0));
+    // planetMVMatrix = glm::rotate(planetMVMatrix, float(glfwGetTime() * -1.0 * orb_speed), axis);
+    planetMVMatrix = glm::rotate(planetMVMatrix, float(glfwGetTime() * rot_speed), axis);
+    planetMVMatrix = glm::scale(planetMVMatrix, glm::vec3(s, s, s));
+    prepareTextures(i, planet->u, textures, mult);
+    fillUniforms(planet->u, planetMVMatrix, matrix, true);
     glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
+    cleanMultTextures(mult);
 }
 
 
@@ -106,7 +135,7 @@ void drawEverything(StarProgram* star, PlanetProgram* planet, PlanetInfo info, s
     drawSun(star, info, textures, matrix, sphere);
     planet->m_Program.use();
     //for(int i=1; i<info.nbOfPlanets(); i++) {}
-    for(int i=3; i<4; i++) {
+    for(int i=1; i<10; i++) {
         drawPlanets(i, planet, info, textures, matrix, sphere);
     }
 }
@@ -114,23 +143,23 @@ void drawEverything(StarProgram* star, PlanetProgram* planet, PlanetInfo info, s
 
 
 
-void drawObjects(PlanetProgram* earth, GLuint texoEarth, GLuint texoCloud, float r, glm::mat4 globalMVMatrix, glm::mat4 viewMatrix, glm::mat4 ProjMatrix, glimac::Sphere ss) {
-    //PlanetProgram earth(applicationPath);
-    earth->m_Program.use();
-    glUniform1i(earth->u.uTexture0, 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texoEarth);
-    glUniform1i(earth->u.uTexture1, 1);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texoCloud);
-    glUniform3fv(earth->u.uKd, 1, glm::value_ptr(glm::vec3(0.8, 0.7, 0.7)));
-    glUniform3fv(earth->u.uKs, 1, glm::value_ptr(glm::vec3(0.5, 0.5, 0.4)));
-    glUniform1f(earth->u.uShininess, 4.0f);
-    glUniform3fv(earth->u.uLightDir_vs, 1, glm::value_ptr(glm::mat3(glm::rotate( glm::mat4(1.0), float(glfwGetTime() * r * 0.5), glm::vec3(0, 1, 0))) * glm::mat3(viewMatrix)));
-    glUniform3fv(earth->u.uLightIntensity, 1, glm::value_ptr(glm::vec3(0.9, 0.9, 0.88)));
-    glm::mat4 earthMVMatrix = glm::rotate(globalMVMatrix, float(glfwGetTime() * r), glm::vec3(0, 1, 0));
-    glUniformMatrix4fv(earth->u.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * earthMVMatrix));
-    glUniformMatrix4fv(earth->u.uMVMatrix, 1, GL_FALSE, glm::value_ptr(earthMVMatrix));
-    glUniformMatrix4fv(earth->u.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(earthMVMatrix))));
-    glDrawArrays(GL_TRIANGLES, 0, ss.getVertexCount());
-}
+// void drawObjects(PlanetProgram* earth, GLuint texoEarth, GLuint texoCloud, float r, glm::mat4 globalMVMatrix, glm::mat4 viewMatrix, glm::mat4 ProjMatrix, glimac::Sphere ss) {
+//     //PlanetProgram earth(applicationPath);
+//     earth->m_Program.use();
+//     glUniform1i(earth->u.uTexture0, 0);
+//     glActiveTexture(GL_TEXTURE0);
+//     glBindTexture(GL_TEXTURE_2D, texoEarth);
+//     glUniform1i(earth->u.uTexture1, 1);
+//     glActiveTexture(GL_TEXTURE1);
+//     glBindTexture(GL_TEXTURE_2D, texoCloud);
+//     glUniform3fv(earth->u.uKd, 1, glm::value_ptr(glm::vec3(0.8, 0.7, 0.7)));
+//     glUniform3fv(earth->u.uKs, 1, glm::value_ptr(glm::vec3(0.5, 0.5, 0.4)));
+//     glUniform1f(earth->u.uShininess, 4.0f);
+//     glUniform3fv(earth->u.uLightDir_vs, 1, glm::value_ptr(glm::mat3(glm::rotate( glm::mat4(1.0), float(glfwGetTime() * r * 0.5), glm::vec3(0, 1, 0))) * glm::mat3(viewMatrix)));
+//     glUniform3fv(earth->u.uLightIntensity, 1, glm::value_ptr(glm::vec3(0.9, 0.9, 0.88)));
+//     glm::mat4 earthMVMatrix = glm::rotate(globalMVMatrix, float(glfwGetTime() * r), glm::vec3(0, 1, 0));
+//     glUniformMatrix4fv(earth->u.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * earthMVMatrix));
+//     glUniformMatrix4fv(earth->u.uMVMatrix, 1, GL_FALSE, glm::value_ptr(earthMVMatrix));
+//     glUniformMatrix4fv(earth->u.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(earthMVMatrix))));
+//     glDrawArrays(GL_TRIANGLES, 0, ss.getVertexCount());
+// }
