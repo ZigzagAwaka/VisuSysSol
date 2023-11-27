@@ -3,10 +3,12 @@
 
 int window_width = 1000;
 int window_height = 1000;
-int CAMERA_TYPE = 0; // 0=trackball, 1=freefly
 
+int CAMERA_TYPE = 0; // 0=trackball, 1=freefly
 glimac::TrackballCamera trackballCamera;
 glimac::FreeflyCamera freeflyCamera;
+
+int INITIAL_DISTANCE = 30;
 
 /* Main fonction of the engine */
 void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath);
@@ -37,7 +39,7 @@ static void mouse_button_callback(GLFWwindow* /*window*/, int /*button*/, int /*
 
 static void scroll_callback(GLFWwindow* /*window*/, double /*xoffset*/, double yoffset) {
     if(CAMERA_TYPE == 0) {
-        float moveSpeed = 1.0;
+        float moveSpeed = 2.0;
         trackballCamera.moveFront(moveSpeed * yoffset);
     }
 }
@@ -164,8 +166,8 @@ void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
         glBindVertexArray(vao);
 
         std::vector<glm::mat4> matrix(3); // ProjMatrix, globalMVMatrix, viewMatrix
-        matrix[0] = glm::perspective(glm::radians(70.0f), float(window_width/window_height), 0.1f, 100.0f);
-        glm::mat4 modelMatrix = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5));
+        matrix[0] = glm::perspective(glm::radians(70.0f), float(window_width/window_height), 0.1f, 150.0f);
+        glm::mat4 modelMatrix = glm::translate(glm::mat4(1), glm::vec3(0, 0, -1*INITIAL_DISTANCE));
         //glm::mat4 globalMVMatrix; glm::mat4 viewMatrix;
         if(CAMERA_TYPE == 0) {
             matrix[2] = trackballCamera.getViewMatrix();

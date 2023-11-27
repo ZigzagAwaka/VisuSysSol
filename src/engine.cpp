@@ -61,6 +61,19 @@ glimac::Sphere createSphere(GLuint* vbo, GLuint* vao, int radius, int discLat, i
 // DRAW FUNCTIONS
 // ============================================================
 
+// Fill the given uniform variables
+void fillUniforms(UniformVariables u, glm::mat4 objectMVMatrix, std::vector<glm::mat4> matrix) {
+    glUniform3fv(u.uKd, 1, glm::value_ptr(glm::vec3(0.8, 0.7, 0.7)));
+    glUniform3fv(u.uKs, 1, glm::value_ptr(glm::vec3(0.5, 0.5, 0.4)));
+    glUniform1f(u.uShininess, 4.0f);
+    glUniform3fv(u.uLightDir_vs, 1, glm::value_ptr(glm::mat3(glm::rotate( glm::mat4(1.0), float(glfwGetTime() * 1.0 * 0.5), glm::vec3(0, 1, 0))) * glm::mat3(matrix[2])));
+    glUniform3fv(u.uLightIntensity, 1, glm::value_ptr(glm::vec3(0.9, 0.9, 0.88)));
+    glUniformMatrix4fv(u.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(matrix[0] * objectMVMatrix));
+    glUniformMatrix4fv(u.uMVMatrix, 1, GL_FALSE, glm::value_ptr(objectMVMatrix));
+    glUniformMatrix4fv(u.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(objectMVMatrix))));
+}
+
+
 void drawSun(StarProgram* star, PlanetInfo info, std::vector<GLuint> textures, std::vector<glm::mat4> matrix, glimac::Sphere sphere) {
     glUniform1i(star->u.uTexture0, 0);
     glActiveTexture(GL_TEXTURE0);
@@ -81,16 +94,9 @@ void drawPlanets(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLui
     glUniform1i(planet->u.uTexture1, 1);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, textures[33]);
-    glUniform3fv(planet->u.uKd, 1, glm::value_ptr(glm::vec3(0.8, 0.7, 0.7)));
-    glUniform3fv(planet->u.uKs, 1, glm::value_ptr(glm::vec3(0.5, 0.5, 0.4)));
-    glUniform1f(planet->u.uShininess, 4.0f);
-    glUniform3fv(planet->u.uLightDir_vs, 1, glm::value_ptr(glm::mat3(glm::rotate( glm::mat4(1.0), float(glfwGetTime() * 1.0 * 0.5), glm::vec3(0, 1, 0))) * glm::mat3(matrix[2])));
-    glUniform3fv(planet->u.uLightIntensity, 1, glm::value_ptr(glm::vec3(0.9, 0.9, 0.88)));
     glm::mat4 planetMVMatrix = glm::rotate(matrix[1], float(glfwGetTime() * 1.0), glm::vec3(0, 1, 0));
     planetMVMatrix = glm::translate(planetMVMatrix, glm::vec3(15.0, 0, 0));
-    glUniformMatrix4fv(planet->u.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(matrix[0] * planetMVMatrix));
-    glUniformMatrix4fv(planet->u.uMVMatrix, 1, GL_FALSE, glm::value_ptr(planetMVMatrix));
-    glUniformMatrix4fv(planet->u.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(planetMVMatrix))));
+    fillUniforms(planet->u, planetMVMatrix, matrix);
     glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
 }
 
