@@ -15,6 +15,9 @@ float PERSPEC_FAR = 100000.0f; // max distance for objects rendering, compared t
 /* Main fonction of the engine */
 void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath);
 
+/* Main structure containing every planets data */
+PlanetInfo planetInfo;
+
 
 // ============================================================
 // CALLBACKS (user inputs)
@@ -30,6 +33,9 @@ static void key_callback(GLFWwindow* window, int key, int /*scancode*/, int acti
             case GLFW_KEY_A: if(CAMERA_TYPE == 1) freeflyCamera.moveLeft(MOVE_SPEED); break;
             case GLFW_KEY_S: if(CAMERA_TYPE == 1) freeflyCamera.moveFront(MOVE_SPEED); break;
             case GLFW_KEY_D: if(CAMERA_TYPE == 1) freeflyCamera.moveLeft(-1.0 * MOVE_SPEED); break;
+            case GLFW_KEY_KP_SUBTRACT: planetInfo.modifySpeed(-100.0); break;
+            case GLFW_KEY_KP_ADD: planetInfo.modifySpeed(100.0); break;
+            case GLFW_KEY_SPACE: planetInfo.pauseTime(); break;
             case GLFW_KEY_ESCAPE: glfwSetWindowShouldClose(window, 1); break;
             default: break;
         }
@@ -117,7 +123,6 @@ int main(int argc, char** argv) {
 
 
 void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
-    PlanetInfo planetInfo;
     StarProgram star(applicationPath);
     PlanetProgram planet(applicationPath);
     std::vector<GLuint> textureObjects = createTextureObjects(applicationPath.dirPath());

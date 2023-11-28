@@ -37,11 +37,12 @@ struct PlanetParams {
 struct PlanetInfo {
     private:
     std::vector<PlanetParams> p; // planets parameters
-    float size_fix = 15.0; // modify size of planets
-    float sun_size_fix = 1.2; // modify size of sun
-    float distance_fix = (sun_size_fix - 1.0) * 1000.0; // correct distance of planets (do not touch)
-    float o_speed = 500.0; // orbit factor speed
-    float r_speed = 20.0; // rotation factor speed
+    float size_fix = 10.0; // modify size of planets
+    float sun_size_fix = 1.0; // modify size of sun
+    float distance_offset = 70.0; // because of sun_size_fix, some planets are too close so little correction
+    float f_speed = 500.0; // orbit and rotation factor speed
+    double time_memory = 0.0; // time of the simulation, if paused
+    bool time_pause = false; // flag to know if the time is paused
     glm::vec3 ecliptic = glm::vec3(0, 1, 0); // rotation axis of earth
 
     public:
@@ -85,12 +86,12 @@ struct PlanetInfo {
 
     /*closest distance to the sun/planet*/
     float perihelion(int i) {
-        return p[i].perihelion + distance_fix;
+        return p[i].perihelion + distance_offset;
     }
 
     /*furthest distance to the sun/planet*/
     float aphelion(int i) {
-        return p[i].aphelion + distance_fix;
+        return p[i].aphelion + distance_offset;
     }
 
     /*average distance to the sun/planet*/
@@ -116,7 +117,7 @@ struct PlanetInfo {
 
     /*speed for a full orbit around the sun/planet*/
     float orbital_speed(int i) {
-        return 1.0 / orbital_period(i) * o_speed;
+        return 1.0 / orbital_period(i) * f_speed;
     }
     
     /*time for the planet to have a proper orbit*/
@@ -126,7 +127,7 @@ struct PlanetInfo {
 
     /*speed for a proper orbit of the planet*/
     float rotation_speed(int i) {
-        return 1.0 / length_of_days(i) * r_speed;
+        return 1.0 / length_of_days(i) * f_speed;
     }
     
     /*inclination of the orbit, in degrees*/
@@ -141,6 +142,31 @@ struct PlanetInfo {
         glm::vec4 res = glm::rotate(glm::mat4(1.0), glm::radians(inc), glm::vec3(1, 0, 0))
                         * glm::vec4(ecliptic, 0.0);
         return glm::vec3(glm::normalize(res));
+    }
+
+    /*modify the speed of the simulation*/
+    void modifySpeed(float f) {
+        float t = f_speed + f;
+        if(t < 0.0 || t > 10000.0) return;
+        f_speed = t;
+    }
+
+    /*pause/resume the time of the simulation*/
+    void pauseTime() {
+        if(time_pause) {
+            time_pause = false;
+            glfwSetTime(time_memory);
+        }
+        else {
+            time_pause = true;
+            time_memory = glfwGetTime();
+        }
+    }
+
+    /*get the time of the simulation*/
+    double getTime() {
+        if(time_pause) return time_memory;
+        return glfwGetTime();
     }
 
     /*number of planets, or celestial body, in this structure*/

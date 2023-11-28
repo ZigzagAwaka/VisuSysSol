@@ -100,8 +100,9 @@ void drawSun(StarProgram* star, PlanetInfo info, std::vector<GLuint> textures, s
     // GET DATA
     float s = info.size(0);
     float rot_speed = info.rotation_speed(0);
+    double time = info.getTime();
     // APPLY DATA
-    glm::mat4 sunMVMatrix = glm::rotate(matrix[1], float(glfwGetTime() * rot_speed), glm::vec3(0, 1, 0));
+    glm::mat4 sunMVMatrix = glm::rotate(matrix[1], float(time * rot_speed), glm::vec3(0, 1, 0));
     sunMVMatrix = glm::scale(sunMVMatrix, glm::vec3(s, s, s));
     prepareTextures(0, star->u, textures, false);
     fillUniforms(star->u, sunMVMatrix, matrix, false);
@@ -116,12 +117,13 @@ void drawPlanets(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLui
     float orb_speed = info.orbital_speed(i);
     float rot_speed = info.rotation_speed(i);
     glm::vec3 axis = info.inclination(i);
+    double time = info.getTime();
     bool mult = info.hasMultipleTex(i);
     // APPLY DATA
-    glm::mat4 planetMVMatrix = glm::rotate(matrix[1], float(glfwGetTime() * orb_speed), axis);
+    glm::mat4 planetMVMatrix = glm::rotate(matrix[1], float(time * orb_speed), axis);
     planetMVMatrix = glm::translate(planetMVMatrix, glm::vec3(d, 0, 0));
-    // planetMVMatrix = glm::rotate(planetMVMatrix, float(glfwGetTime() * -1.0 * orb_speed), axis);
-    planetMVMatrix = glm::rotate(planetMVMatrix, float(glfwGetTime() * rot_speed), axis);
+    // planetMVMatrix = glm::rotate(planetMVMatrix, float(time * -1.0 * orb_speed), axis);
+    planetMVMatrix = glm::rotate(planetMVMatrix, float(time * rot_speed), axis);
     planetMVMatrix = glm::scale(planetMVMatrix, glm::vec3(s, s, s));
     prepareTextures(i, planet->u, textures, mult);
     fillUniforms(planet->u, planetMVMatrix, matrix, true);
