@@ -4,11 +4,7 @@
 int window_width = 1000;
 int window_height = 1000;
 
-int CAMERA_TYPE = 0; // 0=trackball, 1=freefly
-glimac::TrackballCamera trackballCamera;
-glimac::FreeflyCamera freeflyCamera;
-
-float MOVE_SPEED = 20.0; // zoom and moveFront/Left speed of the camera (no rotations)
+Camera camera(0); // 0=trackball, 1=freefly
 int INITIAL_DISTANCE = 1000; // initial distance of camera
 float PERSPEC_FAR = 100000.0f; // max distance for objects rendering, compared to the camera
 
@@ -29,10 +25,10 @@ static void key_callback(GLFWwindow* window, int key, int /*scancode*/, int acti
             case GLFW_KEY_P: glPolygonMode(GL_FRONT_AND_BACK, GL_POINT); break;
             case GLFW_KEY_L: glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
             case GLFW_KEY_F: glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
-            case GLFW_KEY_W: if(CAMERA_TYPE == 1) freeflyCamera.moveFront(-1.0 * MOVE_SPEED); break;
-            case GLFW_KEY_A: if(CAMERA_TYPE == 1) freeflyCamera.moveLeft(MOVE_SPEED); break;
-            case GLFW_KEY_S: if(CAMERA_TYPE == 1) freeflyCamera.moveFront(MOVE_SPEED); break;
-            case GLFW_KEY_D: if(CAMERA_TYPE == 1) freeflyCamera.moveLeft(-1.0 * MOVE_SPEED); break;
+            case GLFW_KEY_W: camera.moveFront(-1.0); break;
+            case GLFW_KEY_A: camera.moveLeft(1.0); break;
+            case GLFW_KEY_S: camera.moveFront(1.0); break;
+            case GLFW_KEY_D: camera.moveLeft(-1.0); break;
             case GLFW_KEY_KP_SUBTRACT: planetInfo.modifySpeed(-100.0); break;
             case GLFW_KEY_KP_ADD: planetInfo.modifySpeed(100.0); break;
             case GLFW_KEY_SPACE: planetInfo.pauseTime(); break;
@@ -45,22 +41,13 @@ static void key_callback(GLFWwindow* window, int key, int /*scancode*/, int acti
 static void mouse_button_callback(GLFWwindow* /*window*/, int /*button*/, int /*action*/, int /*mods*/) {}
 
 static void scroll_callback(GLFWwindow* /*window*/, double /*xoffset*/, double yoffset) {
-    if(CAMERA_TYPE == 0) {
-        trackballCamera.moveFront(MOVE_SPEED * yoffset);
-    }
+    camera.moveFront(yoffset);
 }
 
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
     if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-        float rotationRadius = 2.0;
-        if(CAMERA_TYPE == 0) {
-            trackballCamera.rotateLeft(((xpos - (window_width/2) ) / (window_width/2)) * rotationRadius);
-            trackballCamera.rotateUp((((window_height/2) - ypos) / (window_height/2)) * rotationRadius);
-        }
-        else {
-            freeflyCamera.rotateLeft(((xpos - (window_width/2) ) / (window_width/2)) * rotationRadius);
-            freeflyCamera.rotateUp((((window_height/2) - ypos) / (window_height/2)) * rotationRadius);
-        }
+        camera.rotateLeft((xpos - (window_width/2)) / (window_width/2));
+        camera.rotateUp(((window_height/2) - ypos) / (window_height/2));
     }
 }
 
@@ -172,15 +159,8 @@ void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
         std::vector<glm::mat4> matrix(3); // ProjMatrix, globalMVMatrix, viewMatrix
         matrix[0] = glm::perspective(glm::radians(70.0f), float(window_width/window_height), 0.1f, PERSPEC_FAR);
         glm::mat4 modelMatrix = glm::translate(glm::mat4(1), glm::vec3(0, 0, -1*INITIAL_DISTANCE));
-
-        if(CAMERA_TYPE == 0) {
-            matrix[2] = trackballCamera.getViewMatrix();
-            matrix[1] = modelMatrix * matrix[2];
-        }
-        else {
-            matrix[2] = freeflyCamera.getViewMatrix();
-            matrix[1] = matrix[2] * modelMatrix;
-        }
+        matrix[2] = camera.getViewMatrix();
+        matrix[1] = camera.getGlobalMVMatrix(modelMatrix);
 
         drawEverything(&star, &planet, planetInfo, textureObjects, matrix, sphere);
 

@@ -7,8 +7,6 @@
 #include <glimac/Image.hpp>
 #include <glimac/FilePath.hpp>
 #include <glimac/Sphere.hpp>
-#include <glimac/TrackballCamera.hpp>
-#include <glimac/FreeflyCamera.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/geometric.hpp>
@@ -17,6 +15,7 @@
 #include <stdlib.h>
 #include <vector>
 
+#include "camera.hpp"
 #include "planets.hpp"
 
 
