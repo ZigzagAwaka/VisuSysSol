@@ -229,41 +229,5 @@ struct StarProgram {
         u.uMVMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVMatrix");
         u.uNormalMatrix = glGetUniformLocation(m_Program.getGLId(), "uNormalMatrix");
         u.uTexture0 = glGetUniformLocation(m_Program.getGLId(), "uTexture0");
-        // u.uTexture1 = glGetUniformLocation(m_Program.getGLId(), "uTexture1");
-        // u.uKd = glGetUniformLocation(m_Program.getGLId(), "uKd");
-        // u.uKs = glGetUniformLocation(m_Program.getGLId(), "uKs");
-        // u.uShininess = glGetUniformLocation(m_Program.getGLId(), "uShininess");
-        // u.uLightDir_vs = glGetUniformLocation(m_Program.getGLId(), "uLightDir_vs");
-        // u.uLightIntensity = glGetUniformLocation(m_Program.getGLId(), "uLightIntensity");
     };
 };
-
-
-
-// // will be removed
-// struct MoonProgram {
-//     glimac::Program m_Program;
-//     GLint uMVPMatrix;
-//     GLint uMVMatrix;
-//     GLint uNormalMatrix;
-//     GLint uTexture0;
-//     GLint uKd;
-//     GLint uKs;
-//     GLint uShininess;
-//     GLint uLightDir_vs;
-//     GLint uLightIntensity;
-
-//     MoonProgram(const glimac::FilePath& applicationPath):
-//         m_Program {loadProgram(applicationPath.dirPath() + "src/shaders/position3D.vs.glsl",
-//                                 applicationPath.dirPath() + "src/shaders/tex3D_light.fs.glsl")} {
-//         uMVPMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVPMatrix");
-//         uMVMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVMatrix");
-//         uNormalMatrix = glGetUniformLocation(m_Program.getGLId(), "uNormalMatrix");
-//         uTexture0 = glGetUniformLocation(m_Program.getGLId(), "uTexture0");
-//         uKd = glGetUniformLocation(m_Program.getGLId(), "uKd");
-//         uKs = glGetUniformLocation(m_Program.getGLId(), "uKs");
-//         uShininess = glGetUniformLocation(m_Program.getGLId(), "uShininess");
-//         uLightDir_vs = glGetUniformLocation(m_Program.getGLId(), "uLightDir_vs");
-//         uLightIntensity = glGetUniformLocation(m_Program.getGLId(), "uLightIntensity");
-//     }
-// };
