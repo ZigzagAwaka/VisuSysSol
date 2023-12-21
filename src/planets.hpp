@@ -19,7 +19,7 @@
  * moon, phobos, deimos, calisto, ganymede, europa, io, mimas, enceladus,
  * tethys, dione, rhea, titan, hyperion, iapetus, ariel, umbriel, titania,
  * oberon, miranda, triton, nereid, charon,
- * earthcloud, saturnring, uranusring
+ * earthcloud, saturnring, uranusring, skybox
 */
 
 
@@ -223,6 +223,21 @@ struct StarProgram {
     UniformVariables u;
 
     StarProgram(const glimac::FilePath& applicationPath):
+        m_Program {loadProgram(applicationPath.dirPath() + "src/shaders/position3D.vs.glsl",
+                                applicationPath.dirPath() + "src/shaders/tex3D_star.fs.glsl")} {
+        u.uMVPMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVPMatrix");
+        u.uMVMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVMatrix");
+        u.uNormalMatrix = glGetUniformLocation(m_Program.getGLId(), "uNormalMatrix");
+        u.uTexture0 = glGetUniformLocation(m_Program.getGLId(), "uTexture0");
+    };
+};
+
+/* Program of the skybox */
+struct SkyboxProgram {
+    glimac::Program m_Program;
+    UniformVariables u;
+
+    SkyboxProgram(const glimac::FilePath& applicationPath):
         m_Program {loadProgram(applicationPath.dirPath() + "src/shaders/position3D.vs.glsl",
                                 applicationPath.dirPath() + "src/shaders/tex3D.fs.glsl")} {
         u.uMVPMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVPMatrix");

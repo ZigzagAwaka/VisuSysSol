@@ -110,6 +110,7 @@ int main(int argc, char** argv) {
 
 
 void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
+    SkyboxProgram skybox(applicationPath);
     StarProgram star(applicationPath);
     PlanetProgram planet(applicationPath);
     std::vector<GLuint> textureObjects = createTextureObjects(applicationPath.dirPath());
@@ -127,7 +128,7 @@ void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
         matrix[2] = camera.getViewMatrix();
         matrix[1] = camera.getGlobalMVMatrix(modelMatrix);
 
-        drawEverything(&star, &planet, planetInfo, textureObjects, matrix, sphere);
+        drawEverything(&star, &planet, &skybox, planetInfo, textureObjects, matrix, sphere);
         
         glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);

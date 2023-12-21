@@ -11,7 +11,7 @@ std::vector<GLuint> createTextureObjects(glimac::FilePath binPath) {
         "enceladus.jpg", "tethys.jpg", "dione.jpg", "rhea.jpg", "titan.jpg", "hyperion.jpg",
         "iapetus.jpg", "ariel.jpg", "umbriel.jpg", "titania.jpg", "oberon.jpg", "miranda.jpg",
         "triton.jpg", "nereid.jpg", "charon.jpg", "earthcloud.jpg", "saturnring.jpg",
-        "uranusring.jpg"};
+        "uranusring.jpg", "skybox.jpg"};
     for(size_t i=0; i<textureImages.size(); i++) {
         auto image = glimac::loadImage(binPath + dir + textureImages[i]);
         if(image == NULL) {
@@ -83,7 +83,7 @@ void prepareTextures(int i, UniformVariables u, std::vector<GLuint> textures, bo
     if(multiple) {
         glUniform1i(u.uTexture1, 1);
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, textures[33]);
+        glBindTexture(GL_TEXTURE_2D, textures[33]); // only the earthclouds, for now
     }
 }
 
@@ -93,6 +93,15 @@ void cleanMultTextures(bool multiple) {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
+}
+
+
+void drawSkybox(SkyboxProgram* skybox, std::vector<GLuint> textures, std::vector<glm::mat4> matrix, glimac::Sphere sphere) {
+    float s = 10000.0f;
+    glm::mat4 sbMVMatrix = glm::scale(matrix[1], glm::vec3(s, s, s));
+    prepareTextures(36, skybox->u, textures, false);
+    fillUniforms(skybox->u, sbMVMatrix, matrix, false);
+    glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
 }
 
 
@@ -132,7 +141,9 @@ void drawPlanets(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLui
 }
 
 
-void drawEverything(StarProgram* star, PlanetProgram* planet, PlanetInfo info, std::vector<GLuint> textures, std::vector<glm::mat4> matrix, glimac::Sphere sphere) {
+void drawEverything(StarProgram* star, PlanetProgram* planet, SkyboxProgram* skybox, PlanetInfo info, std::vector<GLuint> textures, std::vector<glm::mat4> matrix, glimac::Sphere sphere) {
+    skybox->m_Program.use();
+    drawSkybox(skybox, textures, matrix, sphere);
     star->m_Program.use();
     drawSun(star, info, textures, matrix, sphere);
     planet->m_Program.use();
