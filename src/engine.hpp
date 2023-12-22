@@ -7,6 +7,7 @@
 #include <glimac/Image.hpp>
 #include <glimac/FilePath.hpp>
 #include <glimac/Sphere.hpp>
+#include <glimac/Circle.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/geometric.hpp>

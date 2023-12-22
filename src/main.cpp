@@ -119,7 +119,6 @@ void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glBindVertexArray(models[0].vao);
 
         std::vector<glm::mat4> matrix(3); // 0=ProjMatrix, 1=globalMVMatrix, 2=viewMatrix
         matrix[0] = glm::perspective(glm::radians(70.0f), float(window_width/window_height), 0.1f, PERSPEC_FAR);
@@ -129,7 +128,6 @@ void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
 
         drawEverything(&star, &planet, &skybox, planetInfo, textureObjects, models, matrix);
         
-        glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);
         glActiveTexture(GL_TEXTURE1);

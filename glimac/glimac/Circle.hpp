@@ -17,9 +17,9 @@ class Circle {
     void build(float radius, int nbP, float fatness); // in cpp file
 
 public:
-    Circle(float radius, int discLat, int discLong):
+    Circle(float radius, int nbP, float fatness):
         m_nVertexCount(0) {
-        build(radius, discLat, discLong);
+        build(radius, nbP, fatness);
     }
 
     // Renvoit le pointeur vers les données

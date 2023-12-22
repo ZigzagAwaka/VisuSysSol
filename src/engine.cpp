@@ -38,15 +38,15 @@ std::vector<GLuint> createTextureObjects(glimac::FilePath binPath) {
 // 3D OBJECTS
 // ============================================================
 
-/* load vbo and vao of a sphere */
-void loadSphere(glimac::Sphere sphere, GLuint* vbo, GLuint* vao) {
+/* load vbo and vao of an object */
+void loadModel(GLsizei vertexCount, const glimac::ShapeVertex* dataPointer, GLuint* vbo, GLuint* vao) {
     const GLuint VERTEX_ATTR_POSITION = 0;
     const GLuint VERTEX_ATTR_NORMAL = 1;
     const GLuint VERTEX_ATTR_TEXTURE = 2;
 
     glGenBuffers(1, vbo);
     glBindBuffer(GL_ARRAY_BUFFER, *vbo);
-    glBufferData(GL_ARRAY_BUFFER, sphere.getVertexCount()*sizeof(glimac::ShapeVertex), sphere.getDataPointer(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount*sizeof(glimac::ShapeVertex), dataPointer, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glGenVertexArrays(1, vao);
@@ -65,11 +65,19 @@ void loadSphere(glimac::Sphere sphere, GLuint* vbo, GLuint* vao) {
 
 std::vector<Model> createModels() {
     std::vector<Model> models;
+
     glimac::Sphere sphere(1, 64, 64);
-    GLuint vbo; GLuint vao;
-    loadSphere(sphere, &vbo, &vao);
-    Model model = Model(vbo, vao, sphere.getVertexCount());
-    models.push_back(model);
+    GLuint vbo0; GLuint vao0;
+    loadModel(sphere.getVertexCount(), sphere.getDataPointer(), &vbo0, &vao0);
+    Model model0 = Model(vbo0, vao0, sphere.getVertexCount());
+    models.push_back(model0);
+
+    glimac::Circle circle(1, 30, 1);
+    GLuint vbo1; GLuint vao1;
+    loadModel(circle.getVertexCount(), circle.getDataPointer(), &vbo1, &vao1);
+    Model model1 = Model(vbo1, vao1, circle.getVertexCount());
+    models.push_back(model1);
+
     return models;
 }
 
@@ -171,6 +179,7 @@ void drawPlanets(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLui
 
 
 void drawEverything(StarProgram* star, PlanetProgram* planet, SkyboxProgram* skybox, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
+    glBindVertexArray(models[0].vao);
     skybox->m_Program.use();
     drawSkybox(skybox, textures, models, matrix);
     star->m_Program.use();
@@ -180,4 +189,5 @@ void drawEverything(StarProgram* star, PlanetProgram* planet, SkyboxProgram* sky
     for(int i=1; i<10; i++) {
         drawPlanets(i, planet, info, textures, models, matrix);
     }
+    glBindVertexArray(0);
 }
