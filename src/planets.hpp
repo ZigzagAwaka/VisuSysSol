@@ -33,13 +33,14 @@ struct PlanetParams {
     float orbital_inclination;
 };
 
+
 /* Global structure to get every parameters of the planets */
 struct PlanetInfo {
     private:
     std::vector<PlanetParams> p; // planets parameters
-    float size_fix = 10.0; // modify size of planets
-    float sun_size_fix = 1.0; // modify size of sun
-    float distance_offset = 70.0; // because of sun_size_fix, some planets are too close so little correction
+    float size_fix = 8.0; // modify size of planets
+    float sun_size_fix = 1.2; // modify size of sun
+    float distance_offset = 100.0; // because of sun_size_fix, some planets are too close so little correction
     float f_speed = 500.0; // orbit and rotation factor speed
     double time_memory = 0.0; // time of the simulation, if paused
     bool time_pause = false; // flag to know if the time is paused

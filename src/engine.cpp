@@ -1,6 +1,10 @@
 #include "engine.hpp"
 
 
+// ============================================================
+// TEXTURES
+// ============================================================
+
 std::vector<GLuint> createTextureObjects(glimac::FilePath binPath) {
     std::vector<GLuint> textureObjects;
     std::string dir = "assets/textures/";
@@ -30,14 +34,18 @@ std::vector<GLuint> createTextureObjects(glimac::FilePath binPath) {
 }
 
 
-glimac::Sphere createSphere(GLuint* vbo, GLuint* vao, int radius, int discLat, int discLong) {
+// ============================================================
+// 3D OBJECTS
+// ============================================================
+
+/* load vbo and vao of a sphere */
+void loadSphere(glimac::Sphere sphere, GLuint* vbo, GLuint* vao) {
     const GLuint VERTEX_ATTR_POSITION = 0;
     const GLuint VERTEX_ATTR_NORMAL = 1;
     const GLuint VERTEX_ATTR_TEXTURE = 2;
 
     glGenBuffers(1, vbo);
     glBindBuffer(GL_ARRAY_BUFFER, *vbo);
-    glimac::Sphere sphere(radius, discLat, discLong);
     glBufferData(GL_ARRAY_BUFFER, sphere.getVertexCount()*sizeof(glimac::ShapeVertex), sphere.getDataPointer(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -52,13 +60,34 @@ glimac::Sphere createSphere(GLuint* vbo, GLuint* vao, int radius, int discLat, i
     glVertexAttribPointer(VERTEX_ATTR_TEXTURE, 2, GL_FLOAT, GL_FALSE, sizeof(glimac::ShapeVertex), (const GLvoid*)offsetof(glimac::ShapeVertex, texCoords));
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+}
 
-    return sphere;
+
+std::vector<Model> createModels() {
+    std::vector<Model> models;
+    glimac::Sphere sphere(1, 64, 64);
+    GLuint vbo; GLuint vao;
+    loadSphere(sphere, &vbo, &vao);
+    Model model = Model(vbo, vao, sphere.getVertexCount());
+    models.push_back(model);
+    return models;
+}
+
+
+GLuint* getDataOfModels(std::vector<Model> models, int type) {
+    std::vector<GLuint> temp;
+    for(size_t i=0; i<models.size(); i++) {
+        GLuint t;
+        if(type == 0) t = models[i].vbo;
+        else t = models[i].vao;
+        temp.push_back(t);
+    }
+    return temp.data();
 }
 
 
 // ============================================================
-// DRAW FUNCTIONS
+// OPENGL DRAW FUNCTIONS
 // ============================================================
 
 // Fill the given uniform variables
@@ -83,7 +112,7 @@ void prepareTextures(int i, UniformVariables u, std::vector<GLuint> textures, bo
     if(multiple) {
         glUniform1i(u.uTexture1, 1);
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, textures[33]); // only the earthclouds, for now
+        glBindTexture(GL_TEXTURE_2D, textures[33]); // only earthclouds, for now
     }
 }
 
@@ -96,16 +125,16 @@ void cleanMultTextures(bool multiple) {
 }
 
 
-void drawSkybox(SkyboxProgram* skybox, std::vector<GLuint> textures, std::vector<glm::mat4> matrix, glimac::Sphere sphere) {
+void drawSkybox(SkyboxProgram* skybox, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
     float s = 10000.0f;
     glm::mat4 sbMVMatrix = glm::scale(matrix[1], glm::vec3(s, s, s));
     prepareTextures(36, skybox->u, textures, false);
     fillUniforms(skybox->u, sbMVMatrix, matrix, false);
-    glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
+    glDrawArrays(GL_TRIANGLES, 0, models[0].vertexCount);
 }
 
 
-void drawSun(StarProgram* star, PlanetInfo info, std::vector<GLuint> textures, std::vector<glm::mat4> matrix, glimac::Sphere sphere) {
+void drawSun(StarProgram* star, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
     // GET DATA
     float s = info.size(0);
     float rot_speed = info.rotation_speed(0);
@@ -115,11 +144,11 @@ void drawSun(StarProgram* star, PlanetInfo info, std::vector<GLuint> textures, s
     sunMVMatrix = glm::scale(sunMVMatrix, glm::vec3(s, s, s));
     prepareTextures(0, star->u, textures, false);
     fillUniforms(star->u, sunMVMatrix, matrix, false);
-    glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
+    glDrawArrays(GL_TRIANGLES, 0, models[0].vertexCount);
 }
 
 
-void drawPlanets(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLuint> textures, std::vector<glm::mat4> matrix, glimac::Sphere sphere) {
+void drawPlanets(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
     // GET DATA
     float d = info.distance(i);
     float s = info.size(i);
@@ -136,19 +165,19 @@ void drawPlanets(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLui
     planetMVMatrix = glm::scale(planetMVMatrix, glm::vec3(s, s, s));
     prepareTextures(i, planet->u, textures, mult);
     fillUniforms(planet->u, planetMVMatrix, matrix, true);
-    glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
+    glDrawArrays(GL_TRIANGLES, 0, models[0].vertexCount);
     cleanMultTextures(mult);
 }
 
 
-void drawEverything(StarProgram* star, PlanetProgram* planet, SkyboxProgram* skybox, PlanetInfo info, std::vector<GLuint> textures, std::vector<glm::mat4> matrix, glimac::Sphere sphere) {
+void drawEverything(StarProgram* star, PlanetProgram* planet, SkyboxProgram* skybox, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
     skybox->m_Program.use();
-    drawSkybox(skybox, textures, matrix, sphere);
+    drawSkybox(skybox, textures, models, matrix);
     star->m_Program.use();
-    drawSun(star, info, textures, matrix, sphere);
+    drawSun(star, info, textures, models, matrix);
     planet->m_Program.use();
     //for(int i=1; i<info.nbOfPlanets(); i++) {}
     for(int i=1; i<10; i++) {
-        drawPlanets(i, planet, info, textures, matrix, sphere);
+        drawPlanets(i, planet, info, textures, models, matrix);
     }
 }

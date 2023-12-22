@@ -113,14 +113,13 @@ void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
     SkyboxProgram skybox(applicationPath);
     StarProgram star(applicationPath);
     PlanetProgram planet(applicationPath);
+    
     std::vector<GLuint> textureObjects = createTextureObjects(applicationPath.dirPath());
-
-    GLuint vbo; GLuint vao;
-    glimac::Sphere sphere = createSphere(&vbo, &vao, 1, 64, 64);
+    std::vector<Model> models = createModels();
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glBindVertexArray(vao);
+        glBindVertexArray(models[0].vao);
 
         std::vector<glm::mat4> matrix(3); // 0=ProjMatrix, 1=globalMVMatrix, 2=viewMatrix
         matrix[0] = glm::perspective(glm::radians(70.0f), float(window_width/window_height), 0.1f, PERSPEC_FAR);
@@ -128,7 +127,7 @@ void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
         matrix[2] = camera.getViewMatrix();
         matrix[1] = camera.getGlobalMVMatrix(modelMatrix);
 
-        drawEverything(&star, &planet, &skybox, planetInfo, textureObjects, matrix, sphere);
+        drawEverything(&star, &planet, &skybox, planetInfo, textureObjects, models, matrix);
         
         glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);
@@ -140,6 +139,6 @@ void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
     }
 
     glDeleteTextures(textureObjects.size(), textureObjects.data());
-    glDeleteBuffers(1, &vbo);
-    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(models.size(), getDataOfModels(models, 0));
+    glDeleteVertexArrays(models.size(), getDataOfModels(models, 1));
 }
