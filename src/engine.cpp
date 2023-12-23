@@ -135,7 +135,7 @@ void cleanMultTextures(bool multiple) {
 }
 
 
-void drawSkybox(SkyboxProgram* skybox, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
+void drawSkybox(ClassicProgram* skybox, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
     float s = 25000.0f;
     glm::mat4 sbMVMatrix = glm::scale(matrix[1], glm::vec3(s, s, s));
     prepareTextures(36, skybox->u, textures, false);
@@ -144,11 +144,9 @@ void drawSkybox(SkyboxProgram* skybox, std::vector<GLuint> textures, std::vector
 }
 
 
-void drawOrbit(int i, SkyboxProgram* orbit, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
-    // GET DATA
+void drawOrbit(int i, ClassicProgram* orbit, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
     float d = info.distance(i);
     float orb_inc = info.orbital_inclination(i);
-    // APPLY DATA
     glm::mat4 orbMVMatrix = glm::rotate(matrix[1], glm::radians(orb_inc), glm::vec3(1, 0, 0));
     orbMVMatrix = glm::scale(orbMVMatrix, glm::vec3(d, d, d));
     prepareTextures(37, orbit->u, textures, false);
@@ -158,11 +156,9 @@ void drawOrbit(int i, SkyboxProgram* orbit, PlanetInfo info, std::vector<GLuint>
 
 
 void drawSun(StarProgram* star, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
-    // GET DATA
     float s = info.size(0);
     float rot_speed = info.rotation_speed(0);
     double time = info.getTime();
-    // APPLY DATA
     glm::mat4 sunMVMatrix = glm::rotate(matrix[1], float(time * rot_speed), glm::vec3(0, 1, 0));
     sunMVMatrix = glm::scale(sunMVMatrix, glm::vec3(s, s, s));
     prepareTextures(0, star->u, textures, false);
@@ -172,7 +168,6 @@ void drawSun(StarProgram* star, PlanetInfo info, std::vector<GLuint> textures, s
 
 
 void drawPlanets(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
-    // GET DATA
     float d = info.distance(i);
     float s = info.size(i);
     float orb_speed = info.orbital_speed(i);
@@ -180,7 +175,6 @@ void drawPlanets(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLui
     glm::vec3 axis = info.inclination(i);
     double time = info.getTime();
     bool mult = info.hasMultipleTex(i);
-    // APPLY DATA
     glm::mat4 planetMVMatrix = glm::rotate(matrix[1], float(time * orb_speed), axis);
     planetMVMatrix = glm::translate(planetMVMatrix, glm::vec3(d, 0, 0));
     // planetMVMatrix = glm::rotate(planetMVMatrix, float(time * -1.0 * orb_speed), axis);
@@ -193,17 +187,17 @@ void drawPlanets(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLui
 }
 
 
-void drawEverything(StarProgram* star, PlanetProgram* planet, SkyboxProgram* skybox, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
-    skybox->m_Program.use();
+void drawEverything(StarProgram* star, PlanetProgram* planet, ClassicProgram* classicObj, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
+    classicObj->m_Program.use();
     if(info.drawOrbit()) {
         glBindVertexArray(models[1].vao); // bind circle
         for(int i=1; i<10; i++) {
-            drawOrbit(i, skybox, info, textures, models, matrix);
+            drawOrbit(i, classicObj, info, textures, models, matrix);
         }
         glBindVertexArray(0);
     }
     glBindVertexArray(models[0].vao); // bind sphere
-    drawSkybox(skybox, textures, models, matrix);
+    drawSkybox(classicObj, textures, models, matrix);
     star->m_Program.use();
     drawSun(star, info, textures, models, matrix);
     planet->m_Program.use();

@@ -37,6 +37,7 @@ struct Model {
 /** Load every textures. The returned vector contains all textures is the global
  * order (see planets.hpp for the order)
  * @param binPath the path to the executable
+ * @return a vector of GLuint, or every created textures
 */
 std::vector<GLuint> createTextureObjects(glimac::FilePath binPath);
 
@@ -51,6 +52,7 @@ std::vector<Model> createModels();
  * pointer to the allocated data of VBOs or VAOs
  * @param models vector of loaded Models
  * @param type 0 for returning VBOs data, or 1 for VAOs
+ * @return a pointer in memory to the allocated data of VBO or VAO
 */
 GLuint* getDataOfModels(std::vector<Model> models, int type);
 
@@ -62,5 +64,5 @@ GLuint* getDataOfModels(std::vector<Model> models, int type);
  * @param matrix vector containing the ProjMatrix, globalMVMatrix and viewMatrix
  * @param sphere a full constructed glimac::Sphere
 */
-void drawEverything(StarProgram* star, PlanetProgram* planet, SkyboxProgram* skybox, PlanetInfo info,
+void drawEverything(StarProgram* star, PlanetProgram* planet, ClassicProgram* skybox, PlanetInfo info,
     std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix);

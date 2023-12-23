@@ -207,7 +207,7 @@ struct UniformVariables {
     GLint uLightIntensity;
 };
 
-/* Program of a classic planet, or celestial body */
+/* Program of a classic planet, or celestial body (can receive light) */
 struct PlanetProgram {
     glimac::Program m_Program;
     UniformVariables u;
@@ -228,7 +228,7 @@ struct PlanetProgram {
     };
 };
 
-/* Program of the sun */
+/* Program of the sun (create light) */
 struct StarProgram {
     glimac::Program m_Program;
     UniformVariables u;
@@ -243,12 +243,12 @@ struct StarProgram {
     };
 };
 
-/* Program of the skybox */
-struct SkyboxProgram {
+/* Program of the skybox, or any other basic object (without light) */
+struct ClassicProgram {
     glimac::Program m_Program;
     UniformVariables u;
 
-    SkyboxProgram(const glimac::FilePath& applicationPath):
+    ClassicProgram(const glimac::FilePath& applicationPath):
         m_Program {loadProgram(applicationPath.dirPath() + "src/shaders/position3D.vs.glsl",
                                 applicationPath.dirPath() + "src/shaders/tex3D.fs.glsl")} {
         u.uMVPMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVPMatrix");
