@@ -15,7 +15,7 @@ std::vector<GLuint> createTextureObjects(glimac::FilePath binPath) {
         "enceladus.jpg", "tethys.jpg", "dione.jpg", "rhea.jpg", "titan.jpg", "hyperion.jpg",
         "iapetus.jpg", "ariel.jpg", "umbriel.jpg", "titania.jpg", "oberon.jpg", "miranda.jpg",
         "triton.jpg", "nereid.jpg", "charon.jpg", "earthcloud.jpg", "saturnring.jpg",
-        "uranusring.jpg", "skybox.jpg"};
+        "uranusring.jpg", "skybox.jpg", "white.jpg"};
     for(size_t i=0; i<textureImages.size(); i++) {
         auto image = glimac::loadImage(binPath + dir + textureImages[i]);
         if(image == NULL) {
@@ -72,7 +72,7 @@ std::vector<Model> createModels() {
     Model model0 = Model(vbo0, vao0, sphere.getVertexCount());
     models.push_back(model0);
 
-    glimac::Circle circle(1, 30, 1);
+    glimac::Circle circle(1, 60, 0);
     GLuint vbo1; GLuint vao1;
     loadModel(circle.getVertexCount(), circle.getDataPointer(), &vbo1, &vao1);
     Model model1 = Model(vbo1, vao1, circle.getVertexCount());
@@ -142,6 +142,19 @@ void drawSkybox(SkyboxProgram* skybox, std::vector<GLuint> textures, std::vector
 }
 
 
+void drawOrbit(int i, SkyboxProgram* orbit, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
+    // GET DATA
+    float d = info.distance(i);
+    float orb_inc = info.orbital_inclination(i);
+    // APPLY DATA
+    glm::mat4 orbMVMatrix = glm::rotate(matrix[1], glm::radians(orb_inc), glm::vec3(1, 0, 0));
+    orbMVMatrix = glm::scale(orbMVMatrix, glm::vec3(d, d, d));
+    prepareTextures(37, orbit->u, textures, false);
+    fillUniforms(orbit->u, orbMVMatrix, matrix, false);
+    glDrawArrays(GL_TRIANGLES, 0, models[1].vertexCount);
+}
+
+
 void drawSun(StarProgram* star, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
     // GET DATA
     float s = info.size(0);
@@ -179,8 +192,15 @@ void drawPlanets(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLui
 
 
 void drawEverything(StarProgram* star, PlanetProgram* planet, SkyboxProgram* skybox, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
-    glBindVertexArray(models[0].vao);
     skybox->m_Program.use();
+    if(info.drawOrbit()) {
+        glBindVertexArray(models[1].vao); // bind circle
+        for(int i=1; i<10; i++) {
+            drawOrbit(i, skybox, info, textures, models, matrix);
+        }
+        glBindVertexArray(0);
+    }
+    glBindVertexArray(models[0].vao); // bind sphere
     drawSkybox(skybox, textures, models, matrix);
     star->m_Program.use();
     drawSun(star, info, textures, models, matrix);

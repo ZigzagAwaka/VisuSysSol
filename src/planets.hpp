@@ -19,7 +19,7 @@
  * moon, phobos, deimos, calisto, ganymede, europa, io, mimas, enceladus,
  * tethys, dione, rhea, titan, hyperion, iapetus, ariel, umbriel, titania,
  * oberon, miranda, triton, nereid, charon,
- * earthcloud, saturnring, uranusring, skybox
+ * earthcloud, saturnring, uranusring, skybox, white
 */
 
 
@@ -38,12 +38,13 @@ struct PlanetParams {
 struct PlanetInfo {
     private:
     std::vector<PlanetParams> p; // planets parameters
-    float size_fix = 8.0; // modify size of planets
-    float sun_size_fix = 1.2; // modify size of sun
-    float distance_offset = 100.0; // because of sun_size_fix, some planets are too close so little correction
+    float size_fix = 30.0; // modify size of planets
+    float sun_size_fix = 1.5; // modify size of sun
+    float f_distance = 5.0; // distance factor
     float f_speed = 500.0; // orbit and rotation factor speed
     double time_memory = 0.0; // time of the simulation, if paused
     bool time_pause = false; // flag to know if the time is paused
+    bool draw_orbit = true; // indicator to draw orbit of planets
     glm::vec3 ecliptic = glm::vec3(0, 1, 0); // rotation axis of earth
 
     public:
@@ -87,12 +88,12 @@ struct PlanetInfo {
 
     /*closest distance to the sun/planet*/
     float perihelion(int i) {
-        return p[i].perihelion + distance_offset;
+        return p[i].perihelion * f_distance;
     }
 
     /*furthest distance to the sun/planet*/
     float aphelion(int i) {
-        return p[i].aphelion + distance_offset;
+        return p[i].aphelion * f_distance;
     }
 
     /*average distance to the sun/planet*/
@@ -168,6 +169,14 @@ struct PlanetInfo {
     double getTime() {
         if(time_pause) return time_memory;
         return glfwGetTime();
+    }
+
+    bool drawOrbit() {
+        return draw_orbit;
+    }
+
+    void modifyDrawOrbit() {
+        draw_orbit = !draw_orbit;
     }
 
     /*number of planets, or celestial body, in this structure*/
