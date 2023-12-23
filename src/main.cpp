@@ -4,8 +4,8 @@
 int window_width = 1000;
 int window_height = 1000;
 
-Camera camera(0); // 0=trackball, 1=freefly
-int INITIAL_DISTANCE = 1000; // initial distance of camera
+Camera camera(1); // 0=trackball, 1=freefly
+int INITIAL_DISTANCE = 3000; // initial distance of camera
 float PERSPEC_FAR = 100000.0f; // max distance for objects rendering, compared to the camera
 
 /* Main fonction of the engine */

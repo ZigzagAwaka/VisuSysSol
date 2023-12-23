@@ -12,7 +12,7 @@ class TrackballCamera {
         float m_fAngleY;
 
     public:
-        TrackballCamera() : m_fDistance {5.0}, m_fAngleX {0.0}, m_fAngleY {0.0} {}
+        TrackballCamera() : m_fDistance {5.0}, m_fAngleX {15.0}, m_fAngleY {45.0} {}
 
         void moveFront(float delta) {
             m_fDistance -= delta;
