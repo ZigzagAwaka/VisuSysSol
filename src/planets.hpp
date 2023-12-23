@@ -38,9 +38,10 @@ struct PlanetParams {
 struct PlanetInfo {
     private:
     std::vector<PlanetParams> p; // planets parameters
-    float size_fix = 30.0; // modify size of planets
+    float size_fix = 20.0; // modify size of planets
     float sun_size_fix = 1.5; // modify size of sun
-    float f_distance = 5.0; // distance factor
+    float distance_offset = 90.0; // because of sun_size_fix, some planets are too close so little correction
+    float f_distance = 2.5; // distance factor
     float f_speed = 500.0; // orbit and rotation factor speed
     double time_memory = 0.0; // time of the simulation, if paused
     bool time_pause = false; // flag to know if the time is paused
@@ -88,12 +89,12 @@ struct PlanetInfo {
 
     /*closest distance to the sun/planet*/
     float perihelion(int i) {
-        return p[i].perihelion * f_distance;
+        return p[i].perihelion * f_distance + distance_offset;
     }
 
     /*furthest distance to the sun/planet*/
     float aphelion(int i) {
-        return p[i].aphelion * f_distance;
+        return p[i].aphelion * f_distance + distance_offset;
     }
 
     /*average distance to the sun/planet*/

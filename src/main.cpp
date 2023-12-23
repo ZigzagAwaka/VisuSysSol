@@ -46,7 +46,8 @@ static void scroll_callback(GLFWwindow* /*window*/, double /*xoffset*/, double y
 }
 
 static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
-    if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+    if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS ||
+        glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         camera.rotateLeft((xpos - (window_width/2)) / (window_width/2));
         camera.rotateUp(((window_height/2) - ypos) / (window_height/2));
     }

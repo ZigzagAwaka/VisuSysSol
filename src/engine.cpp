@@ -134,7 +134,7 @@ void cleanMultTextures(bool multiple) {
 
 
 void drawSkybox(SkyboxProgram* skybox, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
-    float s = 10000.0f;
+    float s = 25000.0f;
     glm::mat4 sbMVMatrix = glm::scale(matrix[1], glm::vec3(s, s, s));
     prepareTextures(36, skybox->u, textures, false);
     fillUniforms(skybox->u, sbMVMatrix, matrix, false);
