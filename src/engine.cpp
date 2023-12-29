@@ -175,9 +175,9 @@ void drawPlanet(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLuin
     glm::vec3 axis = info.inclination(i);
     double time = info.getTime();
     bool mult = info.hasMultipleTex(i);
-    glm::mat4 planetMVMatrix = glm::rotate(matrix[1], float(time * orb_speed), axis);
+    glm::mat4 planetMVMatrix = matrix[1];
+    planetMVMatrix = glm::rotate(planetMVMatrix, float(time * orb_speed), axis);
     planetMVMatrix = glm::translate(planetMVMatrix, glm::vec3(d, 0, 0));
-    // planetMVMatrix = glm::rotate(planetMVMatrix, float(time * -1.0 * orb_speed), axis);
     planetMVMatrix = glm::rotate(planetMVMatrix, float(time * rot_speed), axis);
     planetMVMatrix = glm::scale(planetMVMatrix, glm::vec3(s, s, s));
     prepareTextures(i, planet->u, textures, mult);
@@ -188,26 +188,26 @@ void drawPlanet(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLuin
 
 
 void drawEverything(StarProgram* star, PlanetProgram* planet, ClassicProgram* classicObj, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
-    int view = info.chosenView();
+    int view = info.chosenView(); // get chosen view
     classicObj->m_Program.use();
     if(info.drawOrbit()) {
         glBindVertexArray(models[1].vao); // bind circle
-        for(int i=info.orbitBegin(view); i<info.orbitEnd(view); i++) {
+        for(int i=info.orbitBegin(view); i<info.orbitEnd(view); i++) { // draw orbits
             drawOrbit(i, classicObj, info, textures, models, matrix);
         }
         glBindVertexArray(0);
     }
     glBindVertexArray(models[0].vao); // bind sphere
     drawSkybox(classicObj, textures, models, matrix);
-    if(view == 0) {
+    if(view == 0) { // draw the sun at view 0
         star->m_Program.use();
         drawSun(star, info, textures, models, matrix);
     }
     planet->m_Program.use();
-    if(view != 0) {
+    if(view != 0) { // draw the chosen planet at view != 0
         drawPlanet(view, planet, info, textures, models, matrix);
     }
-    for(int i=info.orbitBegin(view); i<info.orbitEnd(view); i++) {
+    for(int i=info.orbitBegin(view); i<info.orbitEnd(view); i++) { // draw planets in orbit
         drawPlanet(i, planet, info, textures, models, matrix);
     }
     glBindVertexArray(0);
