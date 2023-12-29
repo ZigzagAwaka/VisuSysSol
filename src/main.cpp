@@ -128,7 +128,7 @@ void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
         matrix[2] = camera.getViewMatrix();
         matrix[1] = camera.getGlobalMVMatrix(modelMatrix);
 
-        drawEverything(&star, &planet, &classicObj, planetInfo, textureObjects, models, matrix);
+        drawEverything(0, &star, &planet, &classicObj, planetInfo, textureObjects, models, matrix);
         
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);

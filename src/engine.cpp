@@ -134,7 +134,7 @@ void cleanMultTextures(bool multiple) {
     }
 }
 
-
+// Draw the skybox
 void drawSkybox(ClassicProgram* skybox, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
     float s = 25000.0f;
     glm::mat4 sbMVMatrix = glm::scale(matrix[1], glm::vec3(s, s, s));
@@ -143,7 +143,7 @@ void drawSkybox(ClassicProgram* skybox, std::vector<GLuint> textures, std::vecto
     glDrawArrays(GL_TRIANGLES, 0, models[0].vertexCount);
 }
 
-
+// Draw the n.i asked orbit
 void drawOrbit(int i, ClassicProgram* orbit, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
     float d = info.distance(i);
     float orb_inc = info.orbital_inclination(i);
@@ -154,7 +154,7 @@ void drawOrbit(int i, ClassicProgram* orbit, PlanetInfo info, std::vector<GLuint
     glDrawArrays(GL_TRIANGLES, 0, models[1].vertexCount);
 }
 
-
+// Draw the sun
 void drawSun(StarProgram* star, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
     float s = info.size(0);
     float rot_speed = info.rotation_speed(0);
@@ -166,8 +166,8 @@ void drawSun(StarProgram* star, PlanetInfo info, std::vector<GLuint> textures, s
     glDrawArrays(GL_TRIANGLES, 0, models[0].vertexCount);
 }
 
-
-void drawPlanets(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
+// Draw the n.i asked planet
+void drawPlanet(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
     float d = info.distance(i);
     float s = info.size(i);
     float orb_speed = info.orbital_speed(i);
@@ -187,11 +187,11 @@ void drawPlanets(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLui
 }
 
 
-void drawEverything(StarProgram* star, PlanetProgram* planet, ClassicProgram* classicObj, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
+void drawEverything(int view, StarProgram* star, PlanetProgram* planet, ClassicProgram* classicObj, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
     classicObj->m_Program.use();
     if(info.drawOrbit()) {
         glBindVertexArray(models[1].vao); // bind circle
-        for(int i=1; i<10; i++) {
+        for(int i=info.orbitBegin(view); i<info.orbitEnd(view); i++) {
             drawOrbit(i, classicObj, info, textures, models, matrix);
         }
         glBindVertexArray(0);
@@ -201,9 +201,8 @@ void drawEverything(StarProgram* star, PlanetProgram* planet, ClassicProgram* cl
     star->m_Program.use();
     drawSun(star, info, textures, models, matrix);
     planet->m_Program.use();
-    //for(int i=1; i<info.nbOfPlanets(); i++) {}
-    for(int i=1; i<10; i++) {
-        drawPlanets(i, planet, info, textures, models, matrix);
+    for(int i=info.orbitBegin(view); i<info.orbitEnd(view); i++) {
+        drawPlanet(i, planet, info, textures, models, matrix);
     }
     glBindVertexArray(0);
 }

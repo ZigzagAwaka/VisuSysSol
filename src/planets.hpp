@@ -23,6 +23,12 @@
 */
 
 
+/* Indexes of all objects located in the searched orbit following the above global order */
+struct OrbitIndexs {
+    std::vector<int> begin = {1, };
+    std::vector<int> end   = {9, };
+};
+
 /* Parameters of planets */
 struct PlanetParams {
     float perihelion;
@@ -47,6 +53,7 @@ struct PlanetInfo {
     bool time_pause = false; // flag to know if the time is paused
     bool draw_orbit = true; // indicator to draw orbit of planets
     glm::vec3 ecliptic = glm::vec3(0, 1, 0); // rotation axis of earth
+    OrbitIndexs oi; // indexes in orbit
 
     public:
     PlanetInfo() {
@@ -172,10 +179,12 @@ struct PlanetInfo {
         return glfwGetTime();
     }
 
+    /*to know if we have to draw the orbit or not*/
     bool drawOrbit() {
         return draw_orbit;
     }
 
+    /*inverse the draw_orbit flag*/
     void modifyDrawOrbit() {
         draw_orbit = !draw_orbit;
     }
@@ -183,6 +192,16 @@ struct PlanetInfo {
     /*number of planets, or celestial body, in this structure*/
     int nbOfPlanets() {
         return p.size();
+    }
+
+    /*the begin orbit index of the asked planet*/
+    int orbitBegin(int i) {
+        return oi.begin[i];
+    }
+
+    /*the end orbit index of the asked planet*/
+    int orbitEnd(int i) {
+        return oi.end[i] + 1;
     }
 
     /*return true if the asked planet has multiple texture layers*/

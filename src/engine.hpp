@@ -57,12 +57,14 @@ std::vector<Model> createModels();
 GLuint* getDataOfModels(std::vector<Model> models, int type);
 
 /** Draw every objects of the solar system (function for the MAIN LOOP)
+ * @param view index of the centered object to draw (0 for the sun)
  * @param star program structure of the sun
  * @param planet program structure of planets
+ * @param classicObj program structure of the skybox and orbits
  * @param info PlanetInfo structure containing every planet data
  * @param textures vector containing every pre-loaded textures
+ * @param models vector containing every models (sphere, circle, ...)
  * @param matrix vector containing the ProjMatrix, globalMVMatrix and viewMatrix
- * @param sphere a full constructed glimac::Sphere
 */
-void drawEverything(StarProgram* star, PlanetProgram* planet, ClassicProgram* skybox, PlanetInfo info,
+void drawEverything(int view, StarProgram* star, PlanetProgram* planet, ClassicProgram* classicObj, PlanetInfo info,
     std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix);
