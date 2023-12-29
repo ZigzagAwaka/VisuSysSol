@@ -19,14 +19,14 @@
  * moon, phobos, deimos, calisto, ganymede, europa, io, mimas, enceladus,
  * tethys, dione, rhea, titan, hyperion, iapetus, ariel, umbriel, titania,
  * oberon, miranda, triton, nereid, charon,
- * earthcloud, saturnring, uranusring, skybox, white
+ * earthcloud, saturnring, uranusring, skybox, whiteColor
 */
 
 
 /* Indexes of all objects located in the searched orbit following the above global order */
 struct OrbitIndexs {
-    std::vector<int> begin = {1, };
-    std::vector<int> end   = {9, };
+    std::vector<int> begin = {1, 0, 0, 10, 11, 13, 17, 25, 30, 32};
+    std::vector<int> end   = {9, 0, 0, 10, 12, 16, 24, 29, 31, 32};
 };
 
 /* Parameters of planets */
@@ -202,6 +202,11 @@ struct PlanetInfo {
     /*the end orbit index of the asked planet*/
     int orbitEnd(int i) {
         return oi.end[i] + 1;
+    }
+
+    /*return true if the asked planet has a ring system*/
+    bool hasRings(int i) {
+        return i == 6 || i == 7; // only Saturn and Uranus
     }
 
     /*return true if the asked planet has multiple texture layers*/
