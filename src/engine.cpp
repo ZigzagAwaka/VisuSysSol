@@ -187,7 +187,8 @@ void drawPlanet(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLuin
 }
 
 
-void drawEverything(int view, StarProgram* star, PlanetProgram* planet, ClassicProgram* classicObj, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
+void drawEverything(StarProgram* star, PlanetProgram* planet, ClassicProgram* classicObj, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
+    int view = info.chosenView();
     classicObj->m_Program.use();
     if(info.drawOrbit()) {
         glBindVertexArray(models[1].vao); // bind circle

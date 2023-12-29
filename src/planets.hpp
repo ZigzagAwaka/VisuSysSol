@@ -25,6 +25,7 @@
 
 /* Indexes of all objects located in the searched orbit following the above global order */
 struct OrbitIndexs {
+    int chosenView = 0;
     std::vector<int> begin = {1, 0, 0, 10, 11, 13, 17, 25, 30, 32};
     std::vector<int> end   = {9, 0, 0, 10, 12, 16, 24, 29, 31, 32};
 };
@@ -189,9 +190,16 @@ struct PlanetInfo {
         draw_orbit = !draw_orbit;
     }
 
-    /*number of planets, or celestial body, in this structure*/
-    int nbOfPlanets() {
-        return p.size();
+    /*return the actual chosen view of the drawing*/
+    int chosenView() {
+        return oi.chosenView;
+    }
+
+    /*modify the actual chosen view*/
+    void modifyChosenView() {
+        int actual = chosenView();
+        if(actual == 9) oi.chosenView = 0;
+        else oi.chosenView = actual + 1;
     }
 
     /*the begin orbit index of the asked planet*/

@@ -26,6 +26,7 @@ static void key_callback(GLFWwindow* window, int key, int /*scancode*/, int acti
             case GLFW_KEY_L: glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
             case GLFW_KEY_F: glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
             case GLFW_KEY_O: planetInfo.modifyDrawOrbit(); break;
+            case GLFW_KEY_V: planetInfo.modifyChosenView(); break;
             case GLFW_KEY_W: camera.moveFront(-1.0); break;
             case GLFW_KEY_A: camera.moveLeft(1.0); break;
             case GLFW_KEY_S: camera.moveFront(1.0); break;
@@ -128,7 +129,7 @@ void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
         matrix[2] = camera.getViewMatrix();
         matrix[1] = camera.getGlobalMVMatrix(modelMatrix);
 
-        drawEverything(0, &star, &planet, &classicObj, planetInfo, textureObjects, models, matrix);
+        drawEverything(&star, &planet, &classicObj, planetInfo, textureObjects, models, matrix);
         
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);
