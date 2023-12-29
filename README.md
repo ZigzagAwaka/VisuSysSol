@@ -1,4 +1,4 @@
-# **VisuSysSol** hello my name is john and i'm here to talk about english
+# **VisuSysSol**
 Scientific visualization of the solar system in C++ with OpenGL.
 
 ## **Installation**
