@@ -25,9 +25,19 @@
 
 /* Indexes of all objects located in the searched orbit following the above global order */
 struct OrbitIndexs {
-    int chosenView = 0;
-    std::vector<int> begin = {1, 0, 0, 10, 11, 13, 17, 25, 30, 32};
-    std::vector<int> end   = {9, 0, 0, 10, 12, 16, 24, 29, 31, 32};
+    int chosenView = 0; // actual view of the simulation, 0=sun, 1=mercury, ...
+    std::vector<int> begin = {1,  0,  0, 10, 11, 13, 17, 25, 30, 32};
+    std::vector<int> end   = {9, -1, -1, 10, 12, 16, 24, 29, 31, 32};
+    /*the above list of index defines a range to every objects having other
+    objects turning around them, for example:
+    - the Earth (3rd planet in the solar system, so at index 3 in the vector)
+      only has the Moon so the index begin at 10 (== the Moon in the global
+      order) and end at 10 (== also the Moon)
+    - Jupiter (index 5) has 4 moons from Calisto to Io (from index 13 to 16
+      in the global order)
+    - Mercury does not have anything so in that case the indexes are set
+      from 0 to -1 (will not draw anything)
+    */
 };
 
 /* Parameters of planets */

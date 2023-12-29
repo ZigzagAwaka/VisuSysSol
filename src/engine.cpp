@@ -199,9 +199,14 @@ void drawEverything(StarProgram* star, PlanetProgram* planet, ClassicProgram* cl
     }
     glBindVertexArray(models[0].vao); // bind sphere
     drawSkybox(classicObj, textures, models, matrix);
-    star->m_Program.use();
-    drawSun(star, info, textures, models, matrix);
+    if(view == 0) {
+        star->m_Program.use();
+        drawSun(star, info, textures, models, matrix);
+    }
     planet->m_Program.use();
+    if(view != 0) {
+        drawPlanet(view, planet, info, textures, models, matrix);
+    }
     for(int i=info.orbitBegin(view); i<info.orbitEnd(view); i++) {
         drawPlanet(i, planet, info, textures, models, matrix);
     }
