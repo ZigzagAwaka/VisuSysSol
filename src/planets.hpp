@@ -23,21 +23,20 @@
 */
 
 
-/* Indexes of all objects located in the searched orbit following the above global order */
+/* Indexes of all objects located in the searched orbit following the above global order.
+    The following list of index defines a range to every objects having other objects
+    turning around them, for example:
+    - the Earth (3rd planet in the solar system, so at index 3 in the vector) only has
+      the Moon so the index begin at 10 (== the Moon in the global order) and end
+      at 10 (== also the Moon)
+    - Jupiter (index 5) has 4 moons from Calisto to Io (from index 13 to 16 in the
+      global order)
+    - Mercury does not have anything so in that case the indexes are set from 0 to -1
+      (will not draw anything)*/
 struct OrbitIndexs {
     int chosenView = 0; // actual view of the simulation, 0=sun, 1=mercury, ...
     std::vector<int> begin = {1,  0,  0, 10, 11, 13, 17, 25, 30, 32};
     std::vector<int> end   = {9, -1, -1, 10, 12, 16, 24, 29, 31, 32};
-    /*the above list of index defines a range to every objects having other
-    objects turning around them, for example:
-    - the Earth (3rd planet in the solar system, so at index 3 in the vector)
-      only has the Moon so the index begin at 10 (== the Moon in the global
-      order) and end at 10 (== also the Moon)
-    - Jupiter (index 5) has 4 moons from Calisto to Io (from index 13 to 16
-      in the global order)
-    - Mercury does not have anything so in that case the indexes are set
-      from 0 to -1 (will not draw anything)
-    */
 };
 
 /* Parameters of planets */
@@ -56,10 +55,14 @@ struct PlanetInfo {
     private:
     std::vector<PlanetParams> p; // planets parameters
     float size_fix = 20.0; // modify size of planets
+    float size_fix_v = 170.0; // modify size of planets in view
+    float size_fix_v_orbit = 200.0; // modify size of planets in view and in orbit
     float sun_size_fix = 1.5; // modify size of sun
     float distance_offset = 90.0; // because of sun_size_fix, some planets are too close so little correction
+    float distance_offset_v = 2000.0; // because of size_fix_v, some planets are too close so little correction
     float f_distance = 2.5; // distance factor
-    float f_speed = 500.0; // orbit and rotation factor speed
+    float f_distance_v = 1500.0; // distance factor in view
+    float f_speed = 510.0; // orbit and rotation speed
     double time_memory = 0.0; // time of the simulation, if paused
     bool time_pause = false; // flag to know if the time is paused
     bool draw_orbit = true; // indicator to draw orbit of planets
@@ -107,11 +110,13 @@ struct PlanetInfo {
 
     /*closest distance to the sun/planet*/
     float perihelion(int i) {
+        if(chosenView() != 0) return p[i].perihelion * f_distance_v + distance_offset_v;
         return p[i].perihelion * f_distance + distance_offset;
     }
 
     /*furthest distance to the sun/planet*/
     float aphelion(int i) {
+        if(chosenView() != 0) return p[i].aphelion * f_distance_v + distance_offset_v;
         return p[i].aphelion * f_distance + distance_offset;
     }
 
@@ -128,7 +133,11 @@ struct PlanetInfo {
     /*ratio size of the planet compared to earth*/
     float size(int i) {
         if(i == 0) return diameter(0) / diameter(3) * sun_size_fix; // sun
-        return diameter(i) / diameter(3) * size_fix; // other planets
+        if(chosenView() != 0) {
+            if(i >= 10) return diameter(i) / diameter(3) * size_fix_v_orbit; // planets in view and in orbit
+            return diameter(i) / diameter(3) * size_fix_v; // planets in view
+        }
+        return diameter(i) / diameter(3) * size_fix; // planets around the sun
     }
     
     /*number of days for an orbit around the sun/planet*/
@@ -168,7 +177,7 @@ struct PlanetInfo {
     /*modify the speed of the simulation*/
     void modifySpeed(float f) {
         float t = f_speed + f;
-        if(t < 0.0 || t > 10000.0) return;
+        if(t < 10.0 || t > 10000.0) return;
         f_speed = t;
     }
 

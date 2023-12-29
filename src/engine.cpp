@@ -136,7 +136,7 @@ void cleanMultTextures(bool multiple) {
 
 // Draw the skybox
 void drawSkybox(ClassicProgram* skybox, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
-    float s = 25000.0f;
+    float s = 50000.0f;
     glm::mat4 sbMVMatrix = glm::scale(matrix[1], glm::vec3(s, s, s));
     prepareTextures(36, skybox->u, textures, false);
     fillUniforms(skybox->u, sbMVMatrix, matrix, 0);
@@ -176,8 +176,9 @@ void drawPlanet(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLuin
     double time = info.getTime();
     bool mult = info.hasMultipleTex(i);
     glm::mat4 planetMVMatrix = matrix[1];
-    planetMVMatrix = glm::rotate(planetMVMatrix, float(time * orb_speed), axis);
-    planetMVMatrix = glm::translate(planetMVMatrix, glm::vec3(d, 0, 0));
+    if(info.chosenView() != i) { // if the planet is the chosen view, dont apply these 2 transforms
+        planetMVMatrix = glm::rotate(planetMVMatrix, float(time * orb_speed), axis);
+        planetMVMatrix = glm::translate(planetMVMatrix, glm::vec3(d, 0, 0)); }
     planetMVMatrix = glm::rotate(planetMVMatrix, float(time * rot_speed), axis);
     planetMVMatrix = glm::scale(planetMVMatrix, glm::vec3(s, s, s));
     prepareTextures(i, planet->u, textures, mult);
