@@ -78,6 +78,12 @@ std::vector<Model> createModels() {
     Model model1 = Model(vbo1, vao1, circle.getVertexCount());
     models.push_back(model1);
 
+    glimac::Circle ring(1, 60, 4);
+    GLuint vbo2; GLuint vao2;
+    loadModel(ring.getVertexCount(), ring.getDataPointer(), &vbo2, &vao2);
+    Model model2 = Model(vbo2, vao2, ring.getVertexCount());
+    models.push_back(model2);
+
     return models;
 }
 

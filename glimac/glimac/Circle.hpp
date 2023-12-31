@@ -14,12 +14,14 @@ namespace glimac {
  * @param fatness the "fatness" radius of the circle, can be used to turn the circle into a ring
 */
 class Circle {
-    void build(float radius, int nbP, float fatness); // in cpp file
+    void build(float radius, int nbP); // in cpp file
+    void buildF(float radius, int nbP, float fatness); // in cpp file
 
 public:
     Circle(float radius, int nbP, float fatness):
         m_nVertexCount(0) {
-        build(radius, nbP, fatness);
+        if(fatness > 0) buildF(radius, nbP, fatness);
+        else build(radius, nbP);
     }
 
     // Renvoit le pointeur vers les données

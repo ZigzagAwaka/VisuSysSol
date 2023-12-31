@@ -42,8 +42,8 @@ struct Model {
 std::vector<GLuint> createTextureObjects(glimac::FilePath binPath);
 
 /** Load every needed models (3D objects).
- * The returned vector will have the models at the given indexes :
- * 0=sphere, 1=circle */
+ * @return a vector containing all models at the given indexes
+ * 0=sphere, 1=circle, 2=ring */
 std::vector<Model> createModels();
 
 /** At the end of the program, we need to clean every VBO and VAO using
