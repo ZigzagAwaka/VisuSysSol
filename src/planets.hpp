@@ -55,13 +55,13 @@ struct PlanetInfo {
     private:
     std::vector<PlanetParams> p; // planets parameters
     float size_fix = 20.0; // modify size of planets
-    float size_fix_v = 170.0; // modify size of planets in view
-    float size_fix_v_orbit = 220.0; // modify size of planets in view and in orbit
+    float size_fix_v = 170.0; // modify size of planets when view != 0
+    float size_fix_v_orbit = 240.0; // modify size of moons when view != 0
     float sun_size_fix = 1.5; // modify size of sun
     float distance_offset = 90.0; // because of sun_size_fix, some planets are too close so little correction
-    float distance_offset_v = 2000.0; // because of size_fix_v, some planets are too close so little correction
+    float distance_offset_v = 2700.0; // because of size_fix_v, some moons are too close so little correction
     float f_distance = 2.5; // distance factor
-    float f_distance_v = 1500.0; // distance factor in view
+    float f_distance_v = 1500.0; // distance factor when view != 0
     float f_speed = 510.0; // orbit and rotation speed
     double time_memory = 0.0; // time of the simulation, if paused
     bool time_pause = false; // flag to know if the time is paused

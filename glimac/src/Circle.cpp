@@ -53,8 +53,8 @@ namespace glimac {
         for(int i=0; i<nbP; i++) { // create all vertex
             ShapeVertex vertex;
             
-            vertex.texCoords.x = float(i) * (1.0 / float(nbP));
-            vertex.texCoords.y = 1.f - float(i) * (1.0 / float(nbP));
+            vertex.texCoords.y = float(i) * (1.0 / float(nbP));
+            vertex.texCoords.x = 1.f - float(i) * (1.0 / float(nbP));
 
             vertex.normal.x = cos(glm::radians(angle*float(i)));
             vertex.normal.y = 0.0;

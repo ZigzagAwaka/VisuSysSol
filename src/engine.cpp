@@ -78,7 +78,7 @@ std::vector<Model> createModels() {
     Model model1 = Model(vbo1, vao1, circle.getVertexCount());
     models.push_back(model1);
 
-    glimac::Circle ring(1, 60, 4);
+    glimac::Circle ring(1, 60, 1.4);
     GLuint vbo2; GLuint vao2;
     loadModel(ring.getVertexCount(), ring.getDataPointer(), &vbo2, &vao2);
     Model model2 = Model(vbo2, vao2, ring.getVertexCount());
@@ -160,6 +160,28 @@ void drawOrbit(int i, ClassicProgram* orbit, PlanetInfo info, std::vector<GLuint
     glDrawArrays(GL_TRIANGLES, 0, models[1].vertexCount);
 }
 
+// Draw the ring for the asked planet
+void drawRing(int i, PlanetProgram* ring, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
+    glBindVertexArray(0); // debind sphere
+    glBindVertexArray(models[2].vao); // bind ring
+    float d = info.distance(i);
+    float s = info.size(i) + 170.0;
+    float orb_speed = info.orbital_speed(i);
+    glm::vec3 axis = info.inclination(i);
+    double time = info.getTime();
+    glm::mat4 ringMVMatrix = matrix[1];
+    if(info.chosenView() != i) { // if the planet is the chosen view, dont apply these 2 transforms
+        ringMVMatrix = glm::rotate(ringMVMatrix, float(time * orb_speed), axis);
+        ringMVMatrix = glm::translate(ringMVMatrix, glm::vec3(d, 0, 0)); }
+    ringMVMatrix = glm::rotate(ringMVMatrix, glm::radians(20.0f), glm::vec3(0, 0, 1)); // to give the ring some style
+    ringMVMatrix = glm::scale(ringMVMatrix, glm::vec3(s, s, s));
+    prepareTextures(i+28, ring->u, textures, false); // +28 to get the ring texture of the asked i planet
+    fillUniforms(ring->u, ringMVMatrix, matrix, time * orb_speed);
+    glDrawArrays(GL_TRIANGLES, 0, models[2].vertexCount);
+    glBindVertexArray(0); // debind ring
+    glBindVertexArray(models[0].vao); // bind sphere
+}
+
 // Draw the sun
 void drawSun(StarProgram* star, PlanetInfo info, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
     float s = info.size(0);
@@ -191,6 +213,7 @@ void drawPlanet(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLuin
     fillUniforms(planet->u, planetMVMatrix, matrix, time * orb_speed);
     glDrawArrays(GL_TRIANGLES, 0, models[0].vertexCount);
     cleanMultTextures(mult);
+    if(info.hasRings(i)) drawRing(i, planet, info, textures, models, matrix);
 }
 
 
