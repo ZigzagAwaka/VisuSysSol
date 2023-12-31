@@ -56,7 +56,7 @@ struct PlanetInfo {
     std::vector<PlanetParams> p; // planets parameters
     float size_fix = 20.0; // modify size of planets
     float size_fix_v = 170.0; // modify size of planets in view
-    float size_fix_v_orbit = 200.0; // modify size of planets in view and in orbit
+    float size_fix_v_orbit = 220.0; // modify size of planets in view and in orbit
     float sun_size_fix = 1.5; // modify size of sun
     float distance_offset = 90.0; // because of sun_size_fix, some planets are too close so little correction
     float distance_offset_v = 2000.0; // because of size_fix_v, some planets are too close so little correction
