@@ -165,17 +165,20 @@ void drawRing(int i, PlanetProgram* ring, PlanetInfo info, std::vector<GLuint> t
     glBindVertexArray(0); // debind sphere
     glBindVertexArray(models[2].vao); // bind ring
     float d = info.distance(i);
-    float s = info.size(i) + 170.0;
+    float s = info.size(i) + info.ringSizeFactor();
     float orb_speed = info.orbital_speed(i);
+    float rot_speed = info.rotation_speed(i);
+    float ringIncl = info.ringInclination(i);
     glm::vec3 axis = info.inclination(i);
     double time = info.getTime();
     glm::mat4 ringMVMatrix = matrix[1];
     if(info.chosenView() != i) { // if the planet is the chosen view, dont apply these 2 transforms
         ringMVMatrix = glm::rotate(ringMVMatrix, float(time * orb_speed), axis);
         ringMVMatrix = glm::translate(ringMVMatrix, glm::vec3(d, 0, 0)); }
-    ringMVMatrix = glm::rotate(ringMVMatrix, glm::radians(20.0f), glm::vec3(0, 0, 1)); // to give the ring some style
+    ringMVMatrix = glm::rotate(ringMVMatrix, ringIncl, glm::vec3(0, 0, 1));
+    ringMVMatrix = glm::rotate(ringMVMatrix, float(time * rot_speed),  glm::vec3(0, 1, 0));
     ringMVMatrix = glm::scale(ringMVMatrix, glm::vec3(s, s, s));
-    prepareTextures(i+28, ring->u, textures, false); // +28 to get the ring texture of the asked i planet
+    prepareTextures(i+28, ring->u, textures, false); // +28 in the global order to get the ring texture of the asked i planet
     fillUniforms(ring->u, ringMVMatrix, matrix, time * orb_speed);
     glDrawArrays(GL_TRIANGLES, 0, models[2].vertexCount);
     glBindVertexArray(0); // debind ring

@@ -78,6 +78,7 @@ int main(int argc, char** argv) {
 #endif
 
     /* Create a window and its OpenGL context */
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     GLFWwindow* window = glfwCreateWindow(window_width, window_height, "VisuSysSol", nullptr, nullptr);
     if (!window) {
         glfwTerminate();

@@ -57,6 +57,7 @@ struct PlanetInfo {
     float size_fix = 20.0; // modify size of planets
     float size_fix_v = 170.0; // modify size of planets when view != 0
     float size_fix_v_orbit = 240.0; // modify size of moons when view != 0
+    float f_size_ring = 170.0; // modify size of rings
     float sun_size_fix = 1.5; // modify size of sun
     float distance_offset = 90.0; // because of sun_size_fix, some planets are too close so little correction
     float distance_offset_v = 2700.0; // because of size_fix_v, some moons are too close so little correction
@@ -172,6 +173,18 @@ struct PlanetInfo {
         glm::vec4 res = glm::rotate(glm::mat4(1.0), glm::radians(inc), glm::vec3(1, 0, 0))
                         * glm::vec4(ecliptic, 0.0);
         return glm::vec3(glm::normalize(res));
+    }
+
+    /*get the size factor of ring*/
+    float ringSizeFactor() {
+        return f_size_ring;
+    }
+
+    /*rings do not have the same orbit has the ecliptic, this function is used
+    to give them some style and thus making them more real : get the radian value
+    to which the ring of the planet i needs to be rotated*/
+    float ringInclination(int i) {
+        return glm::radians(20.0f + ((6.0f-float(i)) * -30.0f));
     }
 
     /*modify the speed of the simulation*/
