@@ -104,17 +104,19 @@ GLuint* getDataOfModels(std::vector<Model> models, int type) {
 // OPENGL DRAW FUNCTIONS
 // ============================================================
 
-// Fill the given uniform variables (without light if lightDir < 0)
-void fillUniforms(UniformVariables u, glm::mat4 objectMVMatrix, std::vector<glm::mat4> matrix, float lightDir) {
-    if(lightDir > 0) {
+// Fill the given uniform variables
+// Without light if lightIndicator == 0, with light direction if lightIndicator > 0, or with star time if lightIndicator < 0
+void fillUniforms(UniformVariables u, glm::mat4 objectMVMatrix, std::vector<glm::mat4> matrix, float lightIndicator) {
+    if(lightIndicator > 0) {
         glUniform3fv(u.uKd, 1, glm::value_ptr(glm::vec3(0.8, 0.7, 0.7)));
         glUniform3fv(u.uKs, 1, glm::value_ptr(glm::vec3(0.5, 0.5, 0.4)));
         glUniform1f(u.uShininess, 3.0f);
         glUniform3fv(u.uLightDir_vs, 1, glm::value_ptr(
-            glm::mat3(glm::rotate( glm::rotate(glm::mat4(1.0), glm::radians(180.0f), glm::vec3(0,1,0)), lightDir, glm::vec3(0,1,0) ))
+            glm::mat3(glm::rotate( glm::rotate(glm::mat4(1.0), glm::radians(180.0f), glm::vec3(0,1,0)), lightIndicator, glm::vec3(0,1,0) ))
             * glm::mat3(matrix[2]) ));
         glUniform3fv(u.uLightIntensity, 1, glm::value_ptr(glm::vec3(0.9, 0.9, 0.88)));
     }
+    if(lightIndicator < 0) glUniform1f(u.uTimeSt, -1.0f * lightIndicator);
     glUniformMatrix4fv(u.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(matrix[0] * objectMVMatrix));
     glUniformMatrix4fv(u.uMVMatrix, 1, GL_FALSE, glm::value_ptr(objectMVMatrix));
     glUniformMatrix4fv(u.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(objectMVMatrix))));
@@ -193,7 +195,7 @@ void drawSun(StarProgram* star, PlanetInfo info, std::vector<GLuint> textures, s
     glm::mat4 sunMVMatrix = glm::rotate(matrix[1], float(time * rot_speed), glm::vec3(0, 1, 0));
     sunMVMatrix = glm::scale(sunMVMatrix, glm::vec3(s, s, s));
     prepareTextures(0, star->u, textures, false);
-    fillUniforms(star->u, sunMVMatrix, matrix, 0);
+    fillUniforms(star->u, sunMVMatrix, matrix, -1.0f * float(time));
     glDrawArrays(GL_TRIANGLES, 0, models[0].vertexCount);
 }
 
@@ -215,8 +217,8 @@ void drawPlanet(int i, PlanetProgram* planet, PlanetInfo info, std::vector<GLuin
     prepareTextures(i, planet->u, textures, mult);
     fillUniforms(planet->u, planetMVMatrix, matrix, time * orb_speed);
     glDrawArrays(GL_TRIANGLES, 0, models[0].vertexCount);
-    cleanMultTextures(mult);
-    if(info.hasRings(i)) drawRing(i, planet, info, textures, models, matrix);
+    cleanMultTextures(mult); // clean cloud texture for Earth
+    if(info.hasRings(i)) drawRing(i, planet, info, textures, models, matrix); // draw ring if applicable
 }
 
 

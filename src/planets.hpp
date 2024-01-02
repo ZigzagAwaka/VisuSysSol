@@ -269,6 +269,7 @@ struct UniformVariables {
     GLint uShininess; // material shine factor
     GLint uLightDir_vs; // light direction
     GLint uLightIntensity;
+    GLint uTimeSt; // time passed for the star
 };
 
 /* Program of a classic planet, or celestial body (can receive light) */
@@ -304,6 +305,7 @@ struct StarProgram {
         u.uMVMatrix = glGetUniformLocation(m_Program.getGLId(), "uMVMatrix");
         u.uNormalMatrix = glGetUniformLocation(m_Program.getGLId(), "uNormalMatrix");
         u.uTexture0 = glGetUniformLocation(m_Program.getGLId(), "uTexture0");
+        u.uTimeSt = glGetUniformLocation(m_Program.getGLId(), "uTimeSt");
     };
 };
 
