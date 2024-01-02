@@ -7,6 +7,7 @@ int window_height = 1000;
 Camera camera(0); // 0=trackball, 1=freefly
 int INITIAL_DISTANCE = 3000; // initial distance of camera
 float PERSPEC_FAR = 100000.0f; // max distance for objects rendering, compared to the camera
+bool lowConfig = false; // set this to true if you have a bad pc and needs the models to be less detailed
 
 /* Main fonction of the engine */
 void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath);
@@ -119,9 +120,9 @@ void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
     PlanetProgram planet(applicationPath);
     
     std::vector<GLuint> textureObjects = createTextureObjects(applicationPath.dirPath());
-    std::vector<Model> models = createModels();
+    std::vector<Model> models = createModels(lowConfig);
 
-    while (!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(window)) { // main loop
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         std::vector<glm::mat4> matrix(3); // 0=ProjMatrix, 1=globalMVMatrix, 2=viewMatrix
@@ -130,7 +131,7 @@ void visusyssol(GLFWwindow* window, glimac::FilePath applicationPath) {
         matrix[2] = camera.getViewMatrix();
         matrix[1] = camera.getGlobalMVMatrix(modelMatrix);
 
-        drawEverything(&star, &planet, &classicObj, planetInfo, textureObjects, models, matrix);
+        drawEverything(&star, &planet, &classicObj, planetInfo, textureObjects, models, matrix); // main engine func
         
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);

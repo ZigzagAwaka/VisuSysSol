@@ -111,14 +111,14 @@ struct PlanetInfo {
 
     /*closest distance to the sun/planet*/
     float perihelion(int i) {
-        if(chosenView() != 0) return p[i].perihelion * f_distance_v + distance_offset_v;
-        return p[i].perihelion * f_distance + distance_offset;
+        if(chosenView() != 0) return p[i].perihelion * f_distance_v + distance_offset_v; // moons
+        return p[i].perihelion * f_distance + distance_offset; // planets
     }
 
     /*furthest distance to the sun/planet*/
     float aphelion(int i) {
-        if(chosenView() != 0) return p[i].aphelion * f_distance_v + distance_offset_v;
-        return p[i].aphelion * f_distance + distance_offset;
+        if(chosenView() != 0) return p[i].aphelion * f_distance_v + distance_offset_v; // moons
+        return p[i].aphelion * f_distance + distance_offset; // planets
     }
 
     /*average distance to the sun/planet*/

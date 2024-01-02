@@ -43,12 +43,12 @@ void loadModel(GLsizei vertexCount, const glimac::ShapeVertex* dataPointer, GLui
     const GLuint VERTEX_ATTR_POSITION = 0;
     const GLuint VERTEX_ATTR_NORMAL = 1;
     const GLuint VERTEX_ATTR_TEXTURE = 2;
-
+    // VBO
     glGenBuffers(1, vbo);
     glBindBuffer(GL_ARRAY_BUFFER, *vbo);
     glBufferData(GL_ARRAY_BUFFER, vertexCount*sizeof(glimac::ShapeVertex), dataPointer, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+    // VAO
     glGenVertexArrays(1, vao);
     glBindVertexArray(*vao);
     glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
@@ -63,22 +63,23 @@ void loadModel(GLsizei vertexCount, const glimac::ShapeVertex* dataPointer, GLui
 }
 
 
-std::vector<Model> createModels() {
-    std::vector<Model> models;
+std::vector<Model> createModels(bool lowConfig) {
+    std::vector<Model> models; int N = 64;
+    if(lowConfig) N = 32;
 
-    glimac::Sphere sphere(1, 64, 64);
+    glimac::Sphere sphere(1, N, N); // planets, moons, sun
     GLuint vbo0; GLuint vao0;
     loadModel(sphere.getVertexCount(), sphere.getDataPointer(), &vbo0, &vao0);
     Model model0 = Model(vbo0, vao0, sphere.getVertexCount());
     models.push_back(model0);
 
-    glimac::Circle circle(1, 60, 0);
+    glimac::Circle circle(1, N, 0); // orbits
     GLuint vbo1; GLuint vao1;
     loadModel(circle.getVertexCount(), circle.getDataPointer(), &vbo1, &vao1);
     Model model1 = Model(vbo1, vao1, circle.getVertexCount());
     models.push_back(model1);
 
-    glimac::Circle ring(1, 60, 1.4);
+    glimac::Circle ring(1, N, 1.4); // rings
     GLuint vbo2; GLuint vao2;
     loadModel(ring.getVertexCount(), ring.getDataPointer(), &vbo2, &vao2);
     Model model2 = Model(vbo2, vao2, ring.getVertexCount());
@@ -130,7 +131,7 @@ void prepareTextures(int i, UniformVariables u, std::vector<GLuint> textures, bo
     if(multiple) {
         glUniform1i(u.uTexture1, 1);
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, textures[33]); // only earthclouds, for now
+        glBindTexture(GL_TEXTURE_2D, textures[33]); // only earthclouds (index 33), for now
     }
 }
 
@@ -146,7 +147,7 @@ void cleanMultTextures(bool multiple) {
 void drawSkybox(ClassicProgram* skybox, std::vector<GLuint> textures, std::vector<Model> models, std::vector<glm::mat4> matrix) {
     float s = 50000.0f;
     glm::mat4 sbMVMatrix = glm::scale(matrix[1], glm::vec3(s, s, s));
-    prepareTextures(36, skybox->u, textures, false);
+    prepareTextures(36, skybox->u, textures, false); // skybox is index 36
     fillUniforms(skybox->u, sbMVMatrix, matrix, 0);
     glDrawArrays(GL_TRIANGLES, 0, models[0].vertexCount);
 }
@@ -157,7 +158,7 @@ void drawOrbit(int i, ClassicProgram* orbit, PlanetInfo info, std::vector<GLuint
     float orb_inc = info.orbital_inclination(i);
     glm::mat4 orbMVMatrix = glm::rotate(matrix[1], glm::radians(orb_inc), glm::vec3(1, 0, 0));
     orbMVMatrix = glm::scale(orbMVMatrix, glm::vec3(d, d, d));
-    prepareTextures(37, orbit->u, textures, false);
+    prepareTextures(37, orbit->u, textures, false); // color of orbit is basic white (index 37)
     fillUniforms(orbit->u, orbMVMatrix, matrix, 0);
     glDrawArrays(GL_TRIANGLES, 0, models[1].vertexCount);
 }
@@ -194,7 +195,7 @@ void drawSun(StarProgram* star, PlanetInfo info, std::vector<GLuint> textures, s
     double time = info.getTime();
     glm::mat4 sunMVMatrix = glm::rotate(matrix[1], float(time * rot_speed), glm::vec3(0, 1, 0));
     sunMVMatrix = glm::scale(sunMVMatrix, glm::vec3(s, s, s));
-    prepareTextures(0, star->u, textures, false);
+    prepareTextures(0, star->u, textures, false); // sun is at index 0
     fillUniforms(star->u, sunMVMatrix, matrix, -1.0f * float(time));
     glDrawArrays(GL_TRIANGLES, 0, models[0].vertexCount);
 }
@@ -242,7 +243,7 @@ void drawEverything(StarProgram* star, PlanetProgram* planet, ClassicProgram* cl
     if(view != 0) { // draw the chosen planet at view != 0
         drawPlanet(view, planet, info, textures, models, matrix);
     }
-    for(int i=info.orbitBegin(view); i<info.orbitEnd(view); i++) { // draw planets in orbit
+    for(int i=info.orbitBegin(view); i<info.orbitEnd(view); i++) { // draw planets/moons in orbit
         drawPlanet(i, planet, info, textures, models, matrix);
     }
     glBindVertexArray(0);

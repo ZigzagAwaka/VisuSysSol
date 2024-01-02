@@ -42,9 +42,10 @@ struct Model {
 std::vector<GLuint> createTextureObjects(glimac::FilePath binPath);
 
 /** Load every needed models (3D objects).
+ * @param lowConfig true if need to load less detailed models or false otherwise
  * @return a vector containing all models at the given indexes
  * 0=sphere, 1=circle, 2=ring */
-std::vector<Model> createModels();
+std::vector<Model> createModels(bool lowConfig);
 
 /** At the end of the program, we need to clean every VBO and VAO using
  * glDeleteBuffers() and glDeleteVertexArrays(). But the VBOs and VAOs are
