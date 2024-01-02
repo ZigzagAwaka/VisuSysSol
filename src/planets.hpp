@@ -32,7 +32,7 @@
     - Jupiter (index 5) has 4 moons from Calisto to Io (from index 13 to 16 in the
       global order)
     - Mercury does not have anything so in that case the indexes are set from 0 to -1
-      (will not draw anything)*/
+      (will not draw any moons)*/
 struct OrbitIndexs {
     int chosenView = 0; // actual view of the simulation, 0=sun, 1=mercury, ...
     std::vector<int> begin = {1,  0,  0, 10, 11, 13, 17, 25, 30, 32};
@@ -57,11 +57,11 @@ struct PlanetInfo {
     float size_fix = 20.0; // modify size of planets
     float size_fix_v = 170.0; // modify size of planets when view != 0
     float size_fix_v_orbit = 240.0; // modify size of moons when view != 0
-    float f_size_ring = 170.0; // modify size of rings
-    float sun_size_fix = 1.5; // modify size of sun
-    float distance_offset = 90.0; // because of sun_size_fix, some planets are too close so little correction
+    float f_size_ring = 170.0; // rings size factor
+    float sun_size_fix = 2.0; // modify size of sun
+    float distance_offset = 150.0; // because of sun_size_fix, some planets are too close so little correction
     float distance_offset_v = 2700.0; // because of size_fix_v, some moons are too close so little correction
-    float f_distance = 2.5; // distance factor
+    float f_distance = 3.2; // distance factor
     float f_distance_v = 1500.0; // distance factor when view != 0
     float f_speed = 510.0; // orbit and rotation speed
     double time_memory = 0.0; // time of the simulation, if paused
