@@ -16,7 +16,7 @@ namespace glimac {
             ShapeVertex vertex;
             
             vertex.texCoords.x = float(i) * (1.0 / float(nbP));
-            vertex.texCoords.y = 1.f - float(i) * (1.0 / float(nbP));
+            vertex.texCoords.y = 0.0f;
 
             vertex.normal.x = cos(glm::radians(angle*float(i)));
             vertex.normal.y = 0.0;
@@ -51,21 +51,19 @@ namespace glimac {
         std::vector<ShapeVertex> data;
         std::vector<ShapeVertex> dataF;
         for(int i=0; i<nbP; i++) { // create all vertex
-            ShapeVertex vertex;
-            
-            vertex.texCoords.y = float(i) * (1.0 / float(nbP));
-            vertex.texCoords.x = 1.f - float(i) * (1.0 / float(nbP));
+            ShapeVertex vertex, vertexF;
+            glm::vec3 norm = glm::vec3(cos(glm::radians(angle*float(i))), 0.0, sin(glm::radians(angle*float(i))));
+            float texc_x = float(i) * (1.0 / float(nbP));
 
-            vertex.normal.x = cos(glm::radians(angle*float(i)));
-            vertex.normal.y = 0.0;
-            vertex.normal.z = sin(glm::radians(angle*float(i)));
-            
-            ShapeVertex vertexF = vertex;
-            vertexF.position = fatness * vertexF.normal;
-            dataF.push_back(vertexF);
-
+            vertex.normal = norm;
+            vertex.texCoords = glm::vec2(texc_x, 0.0f);
             vertex.position = radius * vertex.normal;
+
+            vertexF.normal = norm;
+            vertexF.texCoords = glm::vec2(texc_x, 1.0f);
+            vertexF.position = fatness * vertex.normal;
             
+            dataF.push_back(vertexF);
             data.push_back(vertex);
         }
 
