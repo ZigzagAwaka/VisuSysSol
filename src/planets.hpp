@@ -133,12 +133,13 @@ struct PlanetInfo {
 
     /*ratio size of the planet compared to earth*/
     float size(int i) {
-        if(i == 0) return diameter(0) / diameter(3) * sun_size_fix; // sun
+        float d = diameter(i) / diameter(3); // initial size
+        if(i == 0) return d * sun_size_fix; // sun
         if(chosenView() != 0) {
-            if(i >= 10) return diameter(i) / diameter(3) * size_fix_v_orbit; // planets in view and in orbit
-            return diameter(i) / diameter(3) * size_fix_v; // planets in view
+            if(i >= 10) return d * size_fix_v_orbit; // moons (global order>=10) in orbit when view != 0
+            return d * size_fix_v; // planets when view != 0
         }
-        return diameter(i) / diameter(3) * size_fix; // planets around the sun
+        return d * size_fix; // planets around the sun
     }
     
     /*number of days for an orbit around the sun/planet*/
