@@ -32,6 +32,7 @@ static void key_callback(GLFWwindow* window, int key, int /*scancode*/, int acti
             case GLFW_KEY_A: camera.moveLeft(1.0); break;
             case GLFW_KEY_S: camera.moveFront(1.0); break;
             case GLFW_KEY_D: camera.moveLeft(-1.0); break;
+            case GLFW_KEY_T: camera.switchType(); break;
             case GLFW_KEY_KP_SUBTRACT: planetInfo.modifySpeed(-100.0); break;
             case GLFW_KEY_KP_ADD: planetInfo.modifySpeed(100.0); break;
             case GLFW_KEY_SPACE: planetInfo.pauseTime(); break;

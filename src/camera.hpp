@@ -37,6 +37,11 @@ struct Camera {
         else freeflyCamera.rotateUp(degrees * ROTATION_SPEED);
     }
 
+    void switchType() {
+        if(CAMERA_TYPE == 0) CAMERA_TYPE = 1;
+        else CAMERA_TYPE = 0;
+    }
+
     glm::mat4 getViewMatrix() {
         if(CAMERA_TYPE == 0) return trackballCamera.getViewMatrix();
         else return freeflyCamera.getViewMatrix();
