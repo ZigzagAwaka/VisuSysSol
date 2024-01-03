@@ -1,0 +1,4 @@
+Ledoux Johan - VisuSysSol project
+
+Code repo:
+https://github.com/ZigzagAwaka/VisuSysSol
