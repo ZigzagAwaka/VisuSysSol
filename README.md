@@ -25,6 +25,8 @@ Please note that warnings are expected because some external libraries are using
 ```
 
 ## **Usage**
+The executable should be located in a new directory called bin/.
+
 You can move the camera by clicking on the screen while moving your cursor and scroll to zoom.
 
 You can hide orbits by pressing to O key, or modify the draw methods with the F, L and P keys.
