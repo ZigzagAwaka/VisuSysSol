@@ -31,7 +31,7 @@ You can move the camera by clicking on the screen while moving your cursor and s
 
 You can hide orbits by pressing to O key, or modify the draw methods with the F, L and P keys.
 
-If using the trackball camera, you can use the Z, Q, S and D keys to move (or WASD if English keyboard).
+If using the freefly camera, you can use the Z, Q, S and D keys to move (or WASD if English keyboard).
 
 Any others useful information can be found in the report located in the doc/ folder.
 
